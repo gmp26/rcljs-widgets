@@ -28,16 +28,13 @@
   (println "mountcomponent called")
   (rum/mount (a-square) el))
 
-(defn export [component]
-  (set! (.-mountComponent js/window) component))
+(set! (.-exportedComponent js/window) mount-component)
+(.log js/console js/window)
 
-(export mount-component)
-
-
-(defn main []
+#_(defn main []
   ;; conditionally start the app based on whether the #app
   ;; node is on the page
   (if-let [node (.getElementById js/document "app")]
     (rum/mount (rum-tester) node)))
 
-(main)
+#_(main)
