@@ -17,7 +17,7 @@
 (rum/defc a-square []
   [:div {:style {:width "100px"
                  :height "100px"
-                 :background-color "red"}}])
+                 :background-color "orange"}}])
 
 (rum/defc filled-square [fill]
   [:div {:style {:width "100px"
