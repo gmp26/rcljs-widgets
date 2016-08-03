@@ -24,12 +24,17 @@
                  :height "100px"
                  :background-color fill}}])
 
-(defn mount-component [el fill]
+(defn mount_component [el fill]
   (println "mountcomponent called")
   (rum/mount (a-square fill) el))
 
-(set! (.-mountComponent js/window) mount-component)
-(.log js/console js/window)
+;;;
+;; Export the function to mount elements as for use as an htmlwidgets render function
+;;;
+(set! (.-cljsWidgets js/window)
+      (clj->js {:filled_square (fn [el fill] (rum/mount (a-square fill) el))}))
+
+(set! (.-mountComponent js/window) (fn [el fill] (rum/mount (a-square fill) el)))
 
 #_(defn main []
   ;; conditionally start the app based on whether the #app
