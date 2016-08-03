@@ -1,1 +1,1 @@
-function exportedComponent();
+function mountComponent() {};

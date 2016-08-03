@@ -28,7 +28,7 @@
   (println "mountcomponent called")
   (rum/mount (a-square) el))
 
-(set! (.-exportedComponent js/window) mount-component)
+(set! (.-mountComponent js/window) mount-component)
 (.log js/console js/window)
 
 #_(defn main []
