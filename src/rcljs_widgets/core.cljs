@@ -14,19 +14,19 @@
    [:h1 "This is your first devcard!"]]
   )
 
-(rum/defc a-square []
+#_(rum/defc a-square []
   [:div {:style {:width "100px"
                  :height "100px"
                  :background-color "orange"}}])
 
-(rum/defc filled-square [fill]
+(rum/defc a-square [fill]
   [:div {:style {:width "100px"
                  :height "100px"
                  :background-color fill}}])
 
-(defn mount-component [el]
+(defn mount-component [el fill]
   (println "mountcomponent called")
-  (rum/mount (a-square) el))
+  (rum/mount (a-square fill) el))
 
 (set! (.-mountComponent js/window) mount-component)
 (.log js/console js/window)

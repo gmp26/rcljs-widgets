@@ -17,7 +17,4 @@
   (core/rum-tester))
 
 (defcard second-card
-  (core/a-square))
-
-(defcard fill-parameter
-  (core/filled-square "#fc0"))
+  (core/a-square "pink"))
