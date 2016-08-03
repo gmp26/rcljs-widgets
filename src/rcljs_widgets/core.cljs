@@ -11,35 +11,28 @@
 
 (rum/defc rum-tester []
   [:div
-   [:h1 "This is your first devcard!"]]
+   [:h1 "Cljs widgets for R"]]
   )
 
-#_(rum/defc a-square []
-  [:div {:style {:width "100px"
-                 :height "100px"
-                 :background-color "orange"}}])
-
 (rum/defc a-square [fill]
-  [:div {:style {:width "100px"
-                 :height "100px"
+  [:div {:style {:width "100%"
+                 :height "100%"
                  :background-color fill}}])
 
-(defn mount_component [el fill]
-  (println "mountcomponent called")
+(rum/defc a-square-size [fill width height]
+  [:div {:style {:width width
+                 :height height
+                 :background-color fill}}])
+
+(defn mount-component [el fill]
   (rum/mount (a-square fill) el))
 
+(defn resize-component [el fill width  height]
+  (rum/mount (a-square-size fill width height) el))
+
 ;;;
-;; Export the function to mount elements as for use as an htmlwidgets render function
+;; Export render and resize function for each htmlwidget on the cljsWidgets global
 ;;;
 (set! (.-cljsWidgets js/window)
-      (clj->js {:filled_square (fn [el fill] (rum/mount (a-square fill) el))}))
-
-(set! (.-mountComponent js/window) (fn [el fill] (rum/mount (a-square fill) el)))
-
-#_(defn main []
-  ;; conditionally start the app based on whether the #app
-  ;; node is on the page
-  (if-let [node (.getElementById js/document "app")]
-    (rum/mount (rum-tester) node)))
-
-#_(main)
+      (clj->js {:filled_square {:render mount-component
+                                :resize resize-component}}))
