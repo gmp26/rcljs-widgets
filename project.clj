@@ -44,6 +44,7 @@
                         :compiler {:main       "rcljs-widgets.core"
                                    :asset-path "js/compiled/out"
                                    :output-to  "resources/public/js/compiled/rcljs_widgets.js"
+                                   :externs ["externs/exported.js"]
                                    :optimizations :whitespace}}]}
 
   :figwheel { :css-dirs ["resources/public/css"] })
