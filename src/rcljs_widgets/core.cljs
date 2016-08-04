@@ -14,25 +14,25 @@
    [:h1 "Cljs widgets for R"]]
   )
 
-(rum/defc a-square [fill]
-  [:div {:style {:width "100%"
-                 :height "100%"
+(rum/defc square [fill width]
+  [:div {:style {:width width
+                 :height width
                  :background-color fill}}])
 
-(rum/defc a-square-size [fill width height]
+(rum/defc rect [fill width height]
   [:div {:style {:width width
                  :height height
                  :background-color fill}}])
 
 (defn mount-component [el fill]
-  (rum/mount (a-square fill) el))
+  (rum/mount (square fill "100%") el))
 
-(defn resize-component [el fill width  height]
-  (rum/mount (a-square-size fill width height) el))
+(defn resize-component [el fill width height]
+  (rum/mount (rect fill width height) el))
 
 ;;;
 ;; Export render and resize function for each htmlwidget on the cljsWidgets global
 ;;;
 (set! (.-cljsWidgets js/window)
-      (clj->js {:filled_square {:render mount-component
-                                :resize resize-component}}))
+      (clj->js {:filled_rectangle {:render mount-component
+                                   :resize resize-component}}))

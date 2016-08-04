@@ -16,5 +16,8 @@
 (defcard first-card
   (core/rum-tester))
 
-(defcard second-card
-  (core/a-square "pink"))
+(defcard a-square
+  (core/square "rgb(150,170,200)" "100px"))
+
+(defcard a-rectangle
+  (core/rect "rgb(150,200,170)" "150px" "50px"))
