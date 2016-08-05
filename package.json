@@ -1,0 +1,26 @@
+{
+  "name": "rcljs-widgets",
+  "version": "1.0.0",
+  "description": "A collection of cljs htmlwidgets for R",
+  "main": "none",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmp26/rcljs-widgets.git"
+  },
+  "author": "Mike Pearson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gmp26/rcljs-widgets/issues"
+  },
+  "homepage": "https://github.com/gmp26/rcljs-widgets#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.13.1",
+    "babel-preset-react": "^6.11.1"
+  },
+  "dependencies": {
+    "webpack": "^1.13.1"
+  }
+}
