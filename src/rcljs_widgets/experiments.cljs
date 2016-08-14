@@ -1,4 +1,7 @@
-(ns rcljs-widgets.experiments)
+(ns rcljs-widgets.experiments
+  (:require
+    [goog.string :as gstring]
+    [goog.string.format]))
 
 (def foo
   (rum.core/build-defc
@@ -16,3 +19,6 @@
     nil                                                     ;; mixins
     "fee"                                                   ;; display-name
     ))
+
+(defn format [v]
+  (gstring/format "$%2f" v))

@@ -4,6 +4,7 @@
     [cljs.test :as t]
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :as tangle]
+    [rcljs-widgets.experiments :as ex]
     )
   (:require-macros
     [devcards.core :as dc :refer [defcard deftest]]
@@ -28,3 +29,6 @@
 (defcard tangle-numeric
          (tangle/tangle-numeric {:minimum -10 :maximum -9 :steps 10})
          )
+
+(defcard format
+        (ex/format 2.5))
