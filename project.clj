@@ -30,7 +30,8 @@
                                     :asset-path "js/compiled/devcards_out"
                                     :output-to  "resources/public/js/compiled/rcljs_widgets_devcards.js"
                                     :output-dir "resources/public/js/compiled/devcards_out"
-                                    :source-map-timestamp true }}
+                                    :source-map-timestamp true
+                                   }}
                        {:id "dev"
                         :source-paths ["src"]
                         :figwheel true

@@ -2,8 +2,9 @@
   (:require
     [rum.core :as rum]
     [cljs.test :as t]
-    )
-)
+    [goog.string :as gstring]
+    [goog.string.format]
+    ))
 
 (enable-console-print!)
 
@@ -48,3 +49,8 @@
 (set! (.-cljsWidgets js/window)
       (clj->js {:filled_rectangle {:render mount-component
                                    :resize resize-component}}))
+
+(defn format [v]
+  (gstring/format "$%2f" v))
+
+(.log js/console (format 2.5))
