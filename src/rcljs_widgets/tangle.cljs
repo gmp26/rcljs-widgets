@@ -4,7 +4,7 @@
     [cljs.test :as t]
     ))
 
-(defn foo [{:keys [val min] :or {min 0}}]
+(defn foo [boo & [{:keys [val min] :or {min 0}}]]
   [val min]
   (let [val (or val min)]
     [val min]))
@@ -17,20 +17,20 @@
   rum/reactive
   (rum/local false ::mouse-down?)
   [state value &
-   {:keys [on-change minimum maximum step
-           pixel-distance class-name
-           on-input format]
-    :or   {minimum  -Infinity
-           maximum  Infinity
-           step 10
-           format   identity
-           pixelDistance nil
-           on-input (constantly minimum)}}]
+   [{:keys [minimum maximum step
+            pixel-distance class-name
+            on-input format]
+     :or   {minimum       -Infinity
+            maximum       Infinity
+            step          10
+            format        identity
+            pixelDistance nil
+            on-input      (constantly minimum)}}]]
   (let [lb minimum
         ub (if (< lb maximum) maximum (+ lb 100))
-        step (if (< 0 step (/ (- ub lb) 2))
+        step (if (<= 0 step (/ (- ub lb) 2))
                step
-               10)
+               (- ub lb))
         ]
 
     [:div
