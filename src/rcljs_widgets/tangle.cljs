@@ -17,32 +17,35 @@
   rum/reactive
   (rum/local false ::mouse-down?)
   [state value &
-   {:keys [value on-change minimum maximum steps
+   {:keys [on-change minimum maximum step
            pixel-distance class-name
            on-input format]
     :or   {minimum  -Infinity
            maximum  Infinity
-           step 1
+           step 10
            format   identity
            pixelDistance nil
            on-input (constantly minimum)}}]
   (let [lb minimum
         ub (if (< lb maximum) maximum (+ lb 100))
-        val (rum/react value)
-        step (/ (- ub lb) (max 2 steps))
+        step (if (< 0 step (/ (- ub lb) 2))
+               step
+               10)
         ]
 
     [:div
-     [:input.react-tangle-input {:type            "number"
-                                 :value           (rum/react val)
+     [:input.react-tangle-input {:key 1
+                                 :type            "number"
+                                 :value           (rum/react value)
                                  :min             lb
                                  :max             ub
+                                 :step            step
                                  :style           {:width "30px"}
-                                 :on-change       (fn [e] (swap! val (.-value (.-target e))))
+                                 :on-change       (fn [e] (reset! value (.-value (.-target e))))
                                  :on-double-click (fn [e] (.focus (.-target e)))
                                  :on-blur         (fn [e])}]
-     [:div
-      (str "val = " (rum/react val)
+     [:div {:key 2}
+      (str "val = " (rum/react value)
            "; min = " lb
            "; max = " ub
            "; step = " step)]]

@@ -27,7 +27,7 @@
 
 (defcard tangle-numeric
   (tangle/tangle-numeric tangle/tangle-cursor
-                         {:minimum -10 :maximum -9 :steps 10})
+                         {:minimum 0 :maximum 10 :step 2})
   )
 
 (defcard format
