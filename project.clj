@@ -15,12 +15,15 @@
 
   :plugins [
             ;[lein-figwheel "0.5.3-2"]
+            ;[[lein-git-deps "0.0.2-SNAPSHOT"]]
             [lein-cljsbuild "1.1.3" :exclusions [org.clojure/clojure]]]
+
+  ;:git-dependencies [["https://github.com/gmp26/pubsub.git"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled"
                                     "target"]
   
-  :source-paths ["src"]
+  :source-paths ["src" ".lein-git-deps/pubsub/src"]
 
   :cljsbuild {
               :builds [{:id "devcards"

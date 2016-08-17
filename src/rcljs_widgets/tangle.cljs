@@ -1,7 +1,7 @@
 (ns rcljs-widgets.tangle
   (:require
     [rum.core :as rum]
-    [cljs.test :as t]
+    [pubsub.feeds :as q]
     ))
 
 (defn foo [boo & [{:keys [val min] :or {min 0}}]]

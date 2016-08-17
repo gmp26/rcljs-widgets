@@ -1,23 +1,25 @@
 (ns rcljs-widgets.core
   (:require
     [rum.core :as rum]
-    [cljs.test :as t]
     [goog.string :as gstring]
     [goog.string.format]
     ))
 
 (enable-console-print!)
 
-;; Visit http://localhost:3449/index.html to see this
 
+;;;
+
+
+;; Visit http://localhost:3449/index.html to see this
 (rum/defc rum-tester []
   [:div
    [:h1 "Cljs widgets for R"]]
   )
 
 (rum/defc square [fill width]
-  [:div {:style {:width width
-                 :height width
+  [:div {:style {:width            width
+                 :height           width
                  :background-color fill}}])
 
 (rum/defc rect [fill width height]
