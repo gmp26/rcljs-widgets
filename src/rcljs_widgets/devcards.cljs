@@ -4,9 +4,10 @@
     [cljs.test :as t]
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :as tangle]
+    [example.data :refer [*cursor]]
     )
   (:require-macros
-    [devcards.core :as dc :refer [defcard deftest]]
+    [devcards.core :as dc :refer [defcard-doc defcard deftest]]
     ))
 
 (enable-console-print!)
@@ -22,11 +23,8 @@
 (defcard a-rectangle
   (core/rect "rgb(150,200,170)" "60%" "30%"))
 
-(defcard tangle-card
-  (core/tangle-card))
-
 (defcard tangle-numeric
-  (tangle/tangle-numeric tangle/tangle-cursor
+  (tangle/tangle-numeric *cursor
                          {:minimum 0 :maximum 10 :step 5}))
 
 (defcard format

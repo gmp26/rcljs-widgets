@@ -36,7 +36,7 @@
 
 (rum/defc tangle-card []
   [:div
-   (.createElement js/React js/TangleText #js {:value 6 :min 0 :max 10 :setp 1 :onChange #(.log js/console %1)})
+   (.createElement js/React js/TangleText #js {:value 6 :min 0 :max 10 :step 0.1 :onChange #(.log js/console %1)})
    ])
 
 (defn mount-component [el fill]

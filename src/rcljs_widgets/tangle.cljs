@@ -1,22 +1,14 @@
 (ns rcljs-widgets.tangle
   (:require
     [rum.core :as rum]
-    [pubsub.feeds :as q]
+    [pubsub.feeds :as feeds]
+    [example.data]
     ))
 
-(defn foo [boo & [{:keys [val min] :or {min 0}}]]
-  [val min]
-  (let [val (or val min)]
-    [val min]))
 
-(defonce tn (atom {:a {:b 7}}))
-
-(def tangle-cursor (rum/cursor-in tn [:a :b]))
-
-(rum/defcs tangle-numeric <
-  rum/reactive
+(rum/defcs tangle-numeric < rum/reactive
   (rum/local false ::mouse-down?)
-  [state value &
+  [state value *tangle-events &
    [{:keys [minimum maximum step
             pixel-distance class-name
             on-input format]
@@ -32,23 +24,23 @@
                step
                (- ub lb))
         ]
-
-    [:div
-     [:input.react-tangle-input {:key 1
-                                 :type            "number"
-                                 :value           (rum/react value)
-                                 :min             lb
-                                 :max             ub
-                                 :step            step
-                                 :style           {:width "30px"}
-                                 :on-change       (fn [e] (reset! value (.-value (.-target e))))
-                                 :on-double-click (fn [e] (.focus (.-target e)))
-                                 :on-blur         (fn [e])}]
-     [:div {:key 2}
-      (str "val = " (rum/react value)
-           "; min = " lb
-           "; max = " ub
-           "; step = " step)]]
+    (letfn [(handle [event] #(feeds/publish *tangle-events (.-value (.-target %))))]
+      [:div
+       [:input.react-tangle-input {:key             1
+                                   :type            "number"
+                                   :value           (rum/react value)
+                                   :min             lb
+                                   :max             ub
+                                   :step            step
+                                   :style           {:width "30px"}
+                                   :on-change       handle
+                                   :on-double-click #(.focus (.-target %))
+                                   :on-blur         handle}]
+       [:div {:key 2}
+        (str "val = " (rum/react value)
+             "; min = " lb
+             "; max = " ub
+             "; step = " step)]])
 
     )
   )

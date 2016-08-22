@@ -21,6 +21,7 @@
     "babel-preset-react": "^6.11.1"
   },
   "dependencies": {
+    "react-tangle": "^2.2.0",
     "webpack": "^1.13.1"
   }
 }
