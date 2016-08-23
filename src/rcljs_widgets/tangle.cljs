@@ -1,14 +1,14 @@
 (ns rcljs-widgets.tangle
   (:require
     [rum.core :as rum]
-    [pubsub.feeds :as feeds]
+    [pubsub.feeds :as feeds :refer [publish]]
     [example.data]
     ))
 
 
 (rum/defcs tangle-numeric < rum/reactive
   (rum/local false ::mouse-down?)
-  [state value *tangle-events &
+  [state value value-changes &
    [{:keys [minimum maximum step
             pixel-distance class-name
             on-input format]
@@ -24,7 +24,7 @@
                step
                (- ub lb))
         ]
-    (letfn [(handle [event] #(feeds/publish *tangle-events (.-value (.-target %))))]
+    (letfn [(handle [event] (publish value-changes (.. event -target -value)))]
       [:div
        [:input.react-tangle-input {:key             1
                                    :type            "number"
