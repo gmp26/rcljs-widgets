@@ -4,9 +4,10 @@
   text-align:left;
   cursor:col-resize;
   font:inherit;
-  border-bottom:2px dotted #000;
+  border-bottom:2px dotted #88f;
   display:inline;
   width:30px;
+  color: #88f;
 }
 
 .react-tangle-input:focus {

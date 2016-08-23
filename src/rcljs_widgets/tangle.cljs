@@ -29,23 +29,19 @@
     (letfn [(handle [event] (do
                               (println "new value: " (parse (.. event -target -value)))
                               (publish output-stream (parse (.. event -target -value)))))]
-      [:div
-       [:input {:key             1
-                :class           class
-                :type            "text"
-                :value           (format (rum/react value))
-                :min             lb
-                :max             ub
-                :step            step
-                :style           {:width "30px"}
-                :on-change       handle
-                :on-double-click #(.focus (.-target %))
-                :on-blur         handle}]
-       [:div {:key 2}
-        (str "val = " (rum/react value)
-             "; min = " lb
-             "; max = " ub
-             "; step = " step)]])
 
-    )
+      [:input {:class           class
+               :type            "text"
+               :value           (format (rum/react value))
+               :min             lb
+               :max             ub
+               :step            step
+               :style           {:width "30px"}
+               :on-change       handle
+               :on-double-click #(.focus (.-target %))
+               :on-blur         handle}])))
+
+(rum/defc inline-tangle < rum/static [value output-stream]
+  [:span "Embedding a tangle " (tangle-numeric value output-stream) " inline. To change the value, drag the number
+  to left or right. Edit by double clicking on it to gain focus. When the input has focus, up and down keys will step the value up or down and numeric keys will be entered. The widget emits the final value when focus is lost and when it changes."]
   )

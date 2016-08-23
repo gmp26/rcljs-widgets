@@ -3,7 +3,6 @@
     [devcards.core]
     [cards.shapes]
     [cards.tangles]
-    ;[rcljs-widgets.reactjs-devcards]
     ))
 
 ;; The main function here is actually used in a documentation

@@ -3,12 +3,10 @@
     [rum.core :as rum]
     [cljs.test :as t]
     [rcljs-widgets.core :as core]
-    [example.data :refer [cursor*]]
     )
   (:require-macros
     [devcards.core :as dc :refer [defcard-doc defcard deftest]]
     ))
-
 
 (defcard-doc
   "#Rectangle tests
