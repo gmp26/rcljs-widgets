@@ -3,11 +3,13 @@
             [pubsub.feeds :refer [create-feed ->Topic subscribe]]))
 
 (defonce db* (atom {:a {:b 7 :c 9}}))
+(defonce bref* (rum/cursor-in db* [:a :b]))
+(defonce cref* (rum/cursor-in db* [:a :c]))
 
 (defonce feed* (create-feed))
 
-(defonce tangle-events* (->Topic :tangle feed*))
-(defonce tangle-inline* (->Topic :inline feed*))
+(defonce tangle-events* (->Topic :bref feed*))
+(defonce tangle-inline* (->Topic :cref feed*))
 
 (subscribe tangle-events*
            (fn [_ value]

@@ -4,7 +4,7 @@
     [cljs.test :as t]
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :refer [tangle-numeric inline-tangle]]
-    [example.data :refer [db* tangle-events* tangle-inline*]]
+    [example.data :refer [bref* cref* tangle-events* tangle-inline*]]
     [clojure.string :as string]
     [pubsub.feeds :refer [create-feed ->Topic]]
     )
@@ -36,10 +36,9 @@
              (fn [_ value]
                (swap! db* update-in [:a :b] (fn [_] value))))
 
-  (tangle-numeric (rum/cursor-in db* [:a :b])
-    (->Topic :tangle tangle-events*)
+  (tangle-numeric (rum/cursor-in db* [:a :b]) tangle-events*)
   ```"
-  (tangle-numeric (rum/cursor-in db* [:a :b]) tangle-events*
+  (tangle-numeric bref* tangle-events*
                          {:minimum 0 :maximum 10 :step 5
                           :format #(str "£" %)
                           :parse #(string/replace % #"\D" "")}))
@@ -47,7 +46,7 @@
 
 (defcard inline-tangle
   "Tangle-numeric can be embedded inline to provide adjustable values within a sentence."
-  (inline-tangle (rum/cursor-in db* [:a :c]) tangle-inline*))
+  (inline-tangle cref* tangle-inline*))
 
 (defcard-doc
   " ## Interop with a javascript reactjs library
