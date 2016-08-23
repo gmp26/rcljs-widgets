@@ -11,7 +11,7 @@
   ;;
   ;; add a formatter (value -> DOM) and a parser (DOM -> value)
   ;;
-  [state value output-stream &                              ; value is a number, output-stream is a pubsub topic
+  [state value output-stream &        ; value is a number, output-stream is a pubsub topic
    [{:keys [minimum maximum step
             pixel-distance class
             format

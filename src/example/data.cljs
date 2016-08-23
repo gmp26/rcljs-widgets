@@ -4,9 +4,17 @@
 
 (defonce db* (atom {:a {:b 7 :c 9}}))
 
-(def tangle-events* (->Topic :tangle (create-feed)))
+(defonce feed* (create-feed))
+
+(defonce tangle-events* (->Topic :tangle feed*))
+(defonce tangle-inline* (->Topic :inline feed*))
 
 (subscribe tangle-events*
            (fn [_ value]
              (println "received " value)
              (swap! db* update-in [:a :b] (fn [_] value))))
+
+(subscribe tangle-inline*
+           (fn [_ value]
+             (println "inline " value)
+             (swap! db* update-in [:a :c] (fn [_] value))))
