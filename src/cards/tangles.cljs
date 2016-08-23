@@ -1,10 +1,11 @@
-(ns rcljs-widgets.reactjs-devcards
+(ns cards.tangles
   (:require
     [rum.core :as rum]
     [cljs.test :as t]
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :as tangle]
-    [example.data :refer [*cursor]]
+    [example.data :refer [cursor* tangle-events*]]
+    [clojure.string :as string]
     )
   (:require-macros
     [devcards.core :as dc :refer [defcard-doc defcard deftest]]
@@ -14,6 +15,13 @@
 
 ;; Visit http://localhost:3449/cards.html to see this
 
+
+(defcard tangle-numeric
+  (tangle/tangle-numeric cursor* tangle-events*
+                         {:minimum 0 :maximum 10 :step 5
+                          :format #(str "£" %)
+                          :parse #(string/replace % #"\D" "")
+                          }))
 
 (defcard-doc
   " ## Interop with a javascript reactjs library
@@ -34,4 +42,4 @@
   resulting in:")
 
 (defcard tangle-card
-         (core/tangle-card))
+  (core/tangle-card))

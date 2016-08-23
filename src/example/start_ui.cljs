@@ -1,8 +1,10 @@
 (ns example.start-ui
   (:require
     [devcards.core]
-    [rcljs-widgets.devcards]
-    [rcljs-widgets.reactjs-devcards]))
+    [cards.shapes]
+    [cards.tangles]
+    ;[rcljs-widgets.reactjs-devcards]
+    ))
 
 ;; The main function here is actually used in a documentation
 ;; generator that I'm experimenting with. This is not needed

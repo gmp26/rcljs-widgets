@@ -7,35 +7,40 @@
 
 
 (rum/defcs tangle-numeric < rum/reactive
-  (rum/local false ::mouse-down?)
-  [state value value-changes &
+                            (rum/local false ::mouse-down?)
+  ;;
+  ;; add a formatter (value -> DOM) and a parser (DOM -> value)
+  ;;
+  [state value output-stream &                              ; value is a number, output-stream is a pubsub topic
    [{:keys [minimum maximum step
-            pixel-distance class-name
-            on-input format]
+            pixel-distance class
+            format
+            parse]
      :or   {minimum       -Infinity
             maximum       Infinity
-            step          10
-            format        identity
+            step          1
+            class         "react-tangle-input"
             pixelDistance nil
-            on-input      (constantly minimum)}}]]
-  (let [lb minimum
-        ub (if (< lb maximum) maximum (+ lb 100))
-        step (if (<= 0 step (/ (- ub lb) 2))
-               step
-               (- ub lb))
-        ]
-    (letfn [(handle [event] (publish value-changes (.. event -target -value)))]
+            format        identity
+            parse         identity}}]]
+  (let [lb minimum                                          ;lower bound
+        step (if (pos? step) step 1)
+        ub (if (< lb maximum) maximum (+ (* step 10)))]     ;upper bounds
+    (letfn [(handle [event] (do
+                              (println "new value: " (parse (.. event -target -value)))
+                              (publish output-stream (parse (.. event -target -value)))))]
       [:div
-       [:input.react-tangle-input {:key             1
-                                   :type            "number"
-                                   :value           (rum/react value)
-                                   :min             lb
-                                   :max             ub
-                                   :step            step
-                                   :style           {:width "30px"}
-                                   :on-change       handle
-                                   :on-double-click #(.focus (.-target %))
-                                   :on-blur         handle}]
+       [:input {:key             1
+                :class           class
+                :type            "text"
+                :value           (format (rum/react value))
+                :min             lb
+                :max             ub
+                :step            step
+                :style           {:width "30px"}
+                :on-change       handle
+                :on-double-click #(.focus (.-target %))
+                :on-blur         handle}]
        [:div {:key 2}
         (str "val = " (rum/react value)
              "; min = " lb

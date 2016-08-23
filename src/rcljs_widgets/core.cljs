@@ -1,8 +1,7 @@
 (ns rcljs-widgets.core
   (:require
     [rum.core :as rum]
-    [goog.string :as gstring]
-    [goog.string.format]
+
     ))
 
 (enable-console-print!)
@@ -52,11 +51,3 @@
       (clj->js {:filled_rectangle {:render mount-component
                                    :resize resize-component}}))
 
-(defn format
-  "Closure's sprintf equivalent. Do not use this with :advanced compile option, as
-  it misbehaves with dead code removal. For a minimised alternative, look at
-  https://github.com/alexei/sprintf.js"
-  [v]
-  (gstring/format "$%2f" v))
-
-(.log js/console (format 2.5))
