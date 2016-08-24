@@ -3,20 +3,19 @@
             [pubsub.feeds :refer [create-feed ->Topic subscribe]]))
 
 (defonce db* (atom {:a {:b 7 :c 9}}))
-(defonce bref* (rum/cursor-in db* [:a :b]))
-(defonce cref* (rum/cursor-in db* [:a :c]))
+(defonce bref* (rum/cursor-in db* [:a :b]))                 ; allow rum component to watch :b
+(defonce cref* (rum/cursor-in db* [:a :c]))                 ; and :c
 
-(defonce feed* (create-feed))
+(defonce feed* (create-feed))                               ; just the one feed, carrying
+(defonce update-b* (->Topic :bref feed*))                   ; an 'update :b' topic
+(defonce update-c* (->Topic :cref feed*))                   ; and an 'update :c' topic
 
-(defonce tangle-events* (->Topic :bref feed*))
-(defonce tangle-inline* (->Topic :cref feed*))
-
-(subscribe tangle-events*
+(subscribe update-b*
            (fn [_ value]
              (println "received " value)
              (swap! db* update-in [:a :b] (fn [_] value))))
 
-(subscribe tangle-inline*
+(subscribe update-c*
            (fn [_ value]
              (println "inline " value)
              (swap! db* update-in [:a :c] (fn [_] value))))
