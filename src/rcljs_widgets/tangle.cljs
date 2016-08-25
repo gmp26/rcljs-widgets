@@ -9,6 +9,18 @@
     [clojure.string :as s]
     ))
 
+(defn clamp [lb value ub]
+  "return a numeric value adjusted if necessary to be in range"
+  (if (not (js/isNaN value))
+    (if (< value lb)
+      lb
+      (if (> value ub)
+        ub
+        value))
+    (do
+      (println "bad value " value)
+      (/ (+ ub lb) 2))))
+
 (defn handle-down [event state value]
   (when (and (zero? (.-button event)) (not= (.-target event) (.-activeElement js/document)))
     ;(println "v = " @value)
@@ -25,7 +37,7 @@
     (println "start-v " @(::start-value state))
     ))
 
-(defn handle-move [event state output-stream step pixel-distance]
+(defn handle-move [event state output-stream lb ub step pixel-distance]
   (when @(::mouse-down? state)
     (let [moved (- (.-screenX event) @(::start-x state))
           change (int (if (pos? pixel-distance) (/ moved pixel-distance) moved))]
@@ -34,36 +46,23 @@
       (println "change " change)
       (println "step " step)
       (println "start-v " @(::start-value state) " is string? " (string? @(::start-value state)))
-      (publish output-stream (+ @(::start-value state) (* change step))))))
+      (publish output-stream (clamp lb (+ @(::start-value state) (* change step)) ub)))))
 
-(defn handle-up [event state output-stream parse]
+(defn handle-up [event state output-stream parse lb ub]
   (when @(::mouse-down? state)
     (reset! (::mouse-down? state) false)
     (.preventDefault event)
     (if @(::dragged? state)
       (reset! (::dragged? state) false)
       ;; todo: add validation
-      (publish output-stream (parse (.. event -target -value)))
+      (publish output-stream (clamp lb (parse (.. event -target -value)) ub))
       )))
 
-(defn clamp [lb value ub]
-  "return a numeric value that is in range given a proposed value"
-  (if (not (js/isNaN (js/parseInt value)))
-    (if (<= lb value ub)
-      value
-      (if (<= lb value)
-        lb
-        ub))
-    (do
-      (println "bad value " value)
-      (/ (+ ub lb) 2))))
+(def handle-out handle-up)
 
-(not (js/isNaN (js/parseInt "5")))
-
-(defn handle-change [event output-stream parse]
+(defn handle-change [event output-stream parse lb ub]
   (println "new value: " (parse (.. event -target -value)))
-  ;; todo: add validation
-  (publish output-stream (parse (.. event -target -value))))
+  (publish output-stream (clamp lb (parse (.. event -target -value)) ub)))
 
 (rum/defcs tangle-numeric < rum/reactive
                             (rum/local false ::mouse-down?)
@@ -85,14 +84,14 @@
             maximum        Infinity
             step           1
             class          "react-tangle-input"
-            pixel-distance 2
+            pixel-distance 4
             format         identity
-            parse          identity}}]]
+            parse          #(js/parseInt %)}}]]
 
   (let [lb minimum                                          ;lower bound
         step (if (pos? step) step 1)
         ub (if (< lb maximum) maximum (+ (* step 10)))
-        parse (comp #(clamp lb % ub) parse)]                ;upper bound
+        validate (comp #(clamp lb % ub) parse)]                ;upper bound
 
     [:input {:class           class
              :type            "text"
@@ -100,13 +99,14 @@
              :min             lb
              :max             ub
              :step            step
-             :style           {:width "30px"}               ; todo - find a good way to size things
-             :on-change       #(handle-change % output-stream parse)
+             :style           {:width "50px"}               ; todo - find a good way to size things
+             :on-change       #(handle-change % output-stream validate lb ub)
              :on-mouse-down   #(handle-down %1 state value)
-             :on-mouse-up     #(handle-up %1 state output-stream parse)
-             :on-mouse-move   #(handle-move %1 state output-stream step pixel-distance)
+             :on-mouse-up     #(handle-up %1 state output-stream validate lb ub)
+             :on-mouse-out    #(handle-out %1 state output-stream validate lb ub)
+             :on-mouse-move   #(handle-move %1 state output-stream lb ub step pixel-distance)
              :on-double-click #(.focus (.-target %))
-             :on-blur         #(handle-change % output-stream parse)}]))
+             :on-blur         #(handle-change % output-stream validate lb ub)}]))
 
 (rum/defc inline-tangle < rum/static [value output-stream]
   [:span "Embedding a tangle " (tangle-numeric value output-stream) " inline. To change the value, drag the number
