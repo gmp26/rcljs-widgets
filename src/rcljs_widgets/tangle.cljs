@@ -35,7 +35,9 @@
     (reset! (::start-x state) (.-screenX event))
     (reset! (::start-value state) @value)
     (println "start-v " @(::start-value state))
-    ))
+    (let [handlers @(::handlers state)]
+      (js/addEventListener "mousemove" (:move handlers))
+      (js/addEventListener "mouseup" (:up handlers)))))
 
 (defn handle-move [event state output-stream lb ub step pixel-distance]
   (when @(::mouse-down? state)
@@ -48,17 +50,50 @@
       (println "start-v " @(::start-value state) " is string? " (string? @(::start-value state)))
       (publish output-stream (clamp lb (+ @(::start-value state) (* change step)) ub)))))
 
-(defn handle-up [event state output-stream parse lb ub]
+(defn handle-up [event state output-stream validate lb ub]
+  (let [handlers @(::handlers state)]
+    (js/removeEventListener "mousemove" (:move handlers))
+    (js/removeEventListener "mouseup" (:up handlers)))
   (when @(::mouse-down? state)
     (reset! (::mouse-down? state) false)
     (.preventDefault event)
     (if @(::dragged? state)
       (reset! (::dragged? state) false)
-      ;; todo: add validation
-      (publish output-stream (clamp lb (parse (.. event -target -value)) ub))
+      (publish output-stream (clamp lb (validate (.. event -target -value)) ub))
       )))
 
 (def handle-out handle-up)
+
+(defn derived-args [minimum maximum step parse]
+  (let [ub (if (< minimum maximum) maximum (+ (* step 10)))]
+    {:lb       minimum
+     :step     (if (pos? step) step 1)
+     :ub       ub
+     :validate (comp #(clamp minimum % ub) parse)}))
+
+(defn create-handlers [state]
+  ;; create and save transient event handlers in local state
+  (let [args (:rum/args state)
+        [value output-stream & {:keys [minimum maximum step
+                                       pixel-distance parse]
+                                :or   {minimum        -Infinity
+                                       maximum        Infinity
+                                       step           1
+                                       class          "react-tangle-input"
+                                       pixel-distance 4
+                                       format         identity
+                                       parse          #(js/parseInt %)}}] args
+        {:keys [lb step ub validate]} (derived-args minimum maximum step parse)
+        ]
+
+    (println "lb" lb "ub" ub "step" step "pxd" pixel-distance)
+
+    (reset! (::handlers state)
+            {::move #(handle-move %1 state output-stream lb ub step pixel-distance)
+             ::up   #(handle-up %1 state output-stream validate lb ub)}))
+
+  ; be sure to return state from mixin
+  state)
 
 (defn handle-change [event output-stream parse lb ub]
   (println "new value: " (parse (.. event -target -value)))
@@ -69,9 +104,9 @@
                             (rum/local false ::dragged?)
                             (rum/local 0 ::start-x)
                             (rum/local 0 ::start-value)
-                            {:will-update (fn [state]
-                                            (.log js/console @(::mouse-down? state))
-                                            state)}
+                            (rum/local {} ::handlers)
+                            {:did-mount create-handlers}
+
   ;;
   ;; add a formatter (value -> DOM) and a parser (DOM -> value)
   ;;
@@ -88,10 +123,12 @@
             format         identity
             parse          #(js/parseInt %)}}]]
 
-  (let [lb minimum                                          ;lower bound
-        step (if (pos? step) step 1)
-        ub (if (< lb maximum) maximum (+ (* step 10)))
-        validate (comp #(clamp lb % ub) parse)]                ;upper bound
+  (let [{:keys [lb step ub validate]} (derived-args minimum maximum step parse)]
+
+    ;lb minimum                                          ;lower bound
+    ;step (if (pos? step) step 1)
+    ;ub (if (< lb maximum) maximum (+ (* step 10)))
+    ;validate (comp #(clamp lb % ub) parse)]             ;upper bound
 
     [:input {:class           class
              :type            "text"
@@ -102,9 +139,9 @@
              :style           {:width "50px"}               ; todo - find a good way to size things
              :on-change       #(handle-change % output-stream validate lb ub)
              :on-mouse-down   #(handle-down %1 state value)
-             :on-mouse-up     #(handle-up %1 state output-stream validate lb ub)
-             :on-mouse-out    #(handle-out %1 state output-stream validate lb ub)
-             :on-mouse-move   #(handle-move %1 state output-stream lb ub step pixel-distance)
+             ;:on-mouse-up     #(handle-up %1 state output-stream validate lb ub)
+             ;:on-mouse-out    #(handle-out %1 state output-stream validate lb ub)
+             ;:on-mouse-move   #(handle-move %1 state output-stream lb ub step pixel-distance)
              :on-double-click #(.focus (.-target %))
              :on-blur         #(handle-change % output-stream validate lb ub)}]))
 

@@ -91,6 +91,7 @@
 
   (tangle-numeric bref* update-b*
                   {:minimum 0 :maximum 10 :step 1
+                   :pixel-distance 5
                    :format  #(str "£" %)
                    :parse   #(js/parseInt (string/replace % #"\D" ""))})
   )
