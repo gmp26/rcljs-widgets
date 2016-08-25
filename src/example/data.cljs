@@ -12,10 +12,10 @@
 
 (subscribe update-b*
            (fn [_ value]
-             (println "received " value)
+             (println "update b " value)
              (swap! db* update-in [:a :b] (fn [_] value))))
 
 (subscribe update-c*
            (fn [_ value]
-             (println "inline " value)
+             (println "update c " value)
              (swap! db* update-in [:a :c] (fn [_] value))))

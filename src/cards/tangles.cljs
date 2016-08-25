@@ -47,7 +47,7 @@
 
   ```"
   (tangle-numeric bref* update-b*
-                         {:minimum 0 :maximum 10 :step 5
+                         {:minimum 0 :maximum 10 :step 1
                           :format #(str "£" %)
                           :parse #(string/replace % #"\D" "")}))
 
