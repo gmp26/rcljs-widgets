@@ -98,15 +98,16 @@
 
 
 (defcard inline-tangle
-  "#Inline tangle usage
+         "#Inline tangle usage
 
-  This is where tangles come into their own - they provide the ability to make statements that allow complex relations to be explored interactively.
-  Tangle-numeric can be embedded inline to provide adjustable values within a sentence.
-  ```clojure
-  [:span \"Embedding a tangle \" (tangle-numeric cref* update-c*) \" inline.\"]
-  ```
-  "
-  (inline-tangle cref* update-c*))
+         This is where tangles come into their own - they provide the ability to make statements that allow complex relations to be explored interactively.
+         Tangle-numeric can be embedded inline to provide adjustable values within a sentence.
+         ```clojure
+         [:span \"Embedding a tangle \" (tangle-numeric cref* update-c*) \" inline.\"]
+         ```
+         "
+         (inline-tangle cref* update-c*)
+         )
 
 (defcard
   " ## Interop with a javascript reactjs library
