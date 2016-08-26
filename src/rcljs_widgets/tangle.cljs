@@ -19,15 +19,15 @@
       (.addEventListener js/window "mousemove" (::move handlers))
       (.addEventListener js/window "mouseup" (::up handlers)))))
 
-(defn handle-move [event state output-stream lb ub step pixel-distance]
+(defn handle-move [event state output-stream validate step pixel-distance]
   (when @(::mouse-down? state)
     (let [moved (- (.-screenX event) @(::start-x state))
           change (if (pos? pixel-distance) (/ moved pixel-distance) moved)]
       (reset! (::dragged? state) false)
-      (let [new-value (clamp lb (+ @(::start-value state) (* change step)) ub)]
+      (let [new-value (validate (+ @(::start-value state) (* change step)))]
         (publish output-stream new-value)))))
 
-(defn handle-up [event state output-stream validate lb ub]
+(defn handle-up [event state]
   (let [handlers @(::handlers state)]
     (js/removeEventListener "mousemove" (::move handlers))
     (js/removeEventListener "mouseup" (::up handlers)))
@@ -66,8 +66,8 @@
         ub (if (< lb maximum) maximum (+ (* step 10)))
         validate (comp #(clamp lb % ub) parse)]
     (reset! (::handlers state)
-            {::move #(handle-move %1 state output-stream lb ub step pixel-distance)
-             ::up   #(handle-up %1 state output-stream validate lb ub)})
+            {::move #(handle-move %1 state output-stream validate step pixel-distance)
+             ::up   #(handle-up %1 state)})
     [:input {:class           class
              :type            "text"
              :value           (format (rum/react value))

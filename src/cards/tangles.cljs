@@ -1,9 +1,10 @@
 (ns cards.tangles
   (:require
+    [rum.core :as rum]
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :refer [tangle-numeric inline-tangle]]
     [rcljs-widgets.wrapped-react-tangle-js :refer [js-tangletext wrap-js-tangletext]]
-    [example.data :refer [bref* cref* update-b* update-c*]]
+    [example.data :refer [bref* cref* d* update-b* update-c* update-d*]]
     [clojure.string :as string]
     [pubsub.feeds :refer [create-feed ->Topic]]
     [cljs.test :refer-macros [is testing]]
@@ -100,21 +101,23 @@
                    :format         #(str "£" (js/Math.round %))
                    :parse          #(js/parseInt (string/replace % #"£" ""))}))
 
-
-
-
-
-
-(defcard inline-tangle
+(defcard inline-tangles
          "#Inline tangle usage
 
          This is where tangles come into their own - they provide the ability to make statements that allow complex relations to be explored interactively.
-         Tangle-numeric can be embedded inline to provide adjustable values within a sentence.
+         Let's test a few tangles out at once.
          ```clojure
          [:span \"Embedding a tangle \" (tangle-numeric cref* update-c*) \" inline.\"]
          ```
          "
-         (inline-tangle cref* update-c*)
+         ((rum/defc foo []
+             [:span
+              [:p (inline-tangle cref* update-c*)]
+
+              [:p (tangle-numeric d* update-d*
+                                  {:minimum 0 :maximum 10 :step 0.1
+                                   :format  #(.toFixed (js/Number. %) 1)
+                                   :parse   #(/ (js/Math.floor (* 10 (js/parseFloat %1))) 10)})]]))
          )
 
 (defcard
@@ -138,7 +141,7 @@
   resulting in:"
   ;(js-tangletext)
   (wrap-js-tangletext cref* update-c*
-                      {:minimum 0 :maximum 10 :step 1})
+                      {:minimum 0 :maximum 10 :step 0.1})
   )
 
 (deftest

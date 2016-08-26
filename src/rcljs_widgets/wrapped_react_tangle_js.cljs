@@ -35,7 +35,7 @@
         {:value      (rum/react value) :min lb :max ub :step step
          :format     format
          :class-name class :pixel-distance pixel-distance
-         :onChange   (fn [val] (publish output-stream (parse val)))
+         :onChange   (fn [val] (publish output-stream (validate val)))
          }))
 
   )
