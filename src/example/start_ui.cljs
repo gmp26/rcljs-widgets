@@ -1,7 +1,7 @@
 (ns example.start-ui
   (:require
     [devcards.core]
-    [cards.shapes]
+    [cards.rectangles]
     [cards.tangles]
     ))
 

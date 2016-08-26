@@ -5,13 +5,8 @@
   (:require
     [rum.core :as rum]
     [pubsub.feeds :as feeds :refer [publish]]
+    [rcljs-widgets.utils :refer [clamp]]
     ))
-
-(defn clamp [lb value ub]
-  "return a numeric value adjusted if necessary to be in range. Invalid values set the value mid range"
-  (if (not (js/isNaN value))
-    (if (< value lb) lb (if (> value ub) ub value))
-    (/ (+ ub lb) 2)))
 
 (defn handle-down [event state value]
   (when (and (zero? (.-button event)) (not= (.-target event) (.-activeElement js/document)))
@@ -53,7 +48,7 @@
                             (rum/local 0 ::start-x)
                             (rum/local 0 ::start-value)
                             (rum/local {} ::handlers)
-  [state value output-stream &                              ;value is a number, output-stream is a pubsub topic
+  [state value output-stream &           ;value is a number, output-stream is a pubsub topic
    [{:keys [minimum maximum step
             pixel-distance class
             format
@@ -70,7 +65,6 @@
         step (if (pos? step) step 1)
         ub (if (< lb maximum) maximum (+ (* step 10)))
         validate (comp #(clamp lb % ub) parse)]
-    ;[{:keys [lb step ub validate]} (derived-args minimum maximum step parse)]
     (reset! (::handlers state)
             {::move #(handle-move %1 state output-stream lb ub step pixel-distance)
              ::up   #(handle-up %1 state output-stream validate lb ub)})

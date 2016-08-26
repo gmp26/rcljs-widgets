@@ -2,6 +2,7 @@
   (:require
     [rcljs-widgets.core :as core]
     [rcljs-widgets.tangle :refer [tangle-numeric inline-tangle]]
+    [rcljs-widgets.wrapped-react-tangle-js :refer [js-tangletext wrap-js-tangletext]]
     [example.data :refer [bref* cref* update-b* update-c*]]
     [clojure.string :as string]
     [pubsub.feeds :refer [create-feed ->Topic]]
@@ -80,13 +81,15 @@
                 (swap! db* update-in [:a :c] (fn [_] value))))
 
   ```
-  Calling `tangle-numeric` then creates the react element. Here we ensure that the tangle steps by £1, returns an integer
-  value
+  Calling `tangle-numeric` then creates the react element. Here we ensure that the tangle steps by £1, and returns an integer value.
+
+  In general, (parse (format x) == x for all x of interest (integers in [0,10] here)
+
   ```clojure
   (tangle-numeric bref* update-b*
                   {:minimum 0 :maximum 10 :step 1
                    :format #(str \"£\" %)
-                   :parse #(string/replace % #\"\\D\" \"\")})
+                   :parse #(js/parseInt (string/replace % #\"[^\\d.]\" \"\")})
   ```
 
   ###...yielding"
@@ -95,7 +98,9 @@
                   {:minimum        0 :maximum 10 :step 1
                    :pixel-distance 5
                    :format         #(str "£" (js/Math.round %))
-                   :parse          #(js/parseInt (string/replace % #"[^\d.]" ""))}))
+                   :parse          #(js/parseInt (string/replace % #"£" ""))}))
+
+
 
 
 
@@ -131,7 +136,9 @@
     (core/tangle-card))
   ```
   resulting in:"
-  (core/tangle-card)
+  ;(js-tangletext)
+  (wrap-js-tangletext cref* update-c*
+                      {:minimum 0 :maximum 10 :step 1})
   )
 
 (deftest

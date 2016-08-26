@@ -1,8 +1,8 @@
-(ns cards.shapes
+(ns cards.rectangles
   (:require
     [rum.core :as rum]
     [cljs.test :as t]
-    [rcljs-widgets.core :as core]
+    [rcljs-widgets.rectangles :as rects]
     )
   (:require-macros
     [devcards.core :as dc :refer [defcard-doc defcard deftest]]
@@ -14,7 +14,7 @@
   )
 
 (defcard a-square
-  (core/square "rgb(150,170,200)" "100px"))
+  (rects/square "rgb(150,170,200)" "100px"))
 
 (defcard a-rectangle
-  (core/rect "rgb(150,200,170)" "60%" "30%"))
+  (rects/rect "rgb(150,200,170)" "60%" "30%"))
