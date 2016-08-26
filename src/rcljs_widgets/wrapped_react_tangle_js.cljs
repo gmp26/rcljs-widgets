@@ -31,13 +31,12 @@
         validate (comp #(clamp lb % ub) parse)]
 
 
-    [:span
-     (.createElement js/React js/TangleText #js
-         {:value      (rum/react value) :min lb :max ub :step step
-          :format     format
-          :class-name class :pixel-distance pixel-distance
-          :onChange   (fn [val] (publish output-stream (parse val)))
-          })])
+    (.createElement js/React js/TangleText #js
+        {:value      (rum/react value) :min lb :max ub :step step
+         :format     format
+         :class-name class :pixel-distance pixel-distance
+         :onChange   (fn [val] (publish output-stream (parse val)))
+         }))
 
   )
 
