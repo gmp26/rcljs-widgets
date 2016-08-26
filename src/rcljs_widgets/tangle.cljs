@@ -27,7 +27,7 @@
 (defn handle-move [event state output-stream lb ub step pixel-distance]
   (when @(::mouse-down? state)
     (let [moved (- (.-screenX event) @(::start-x state))
-          change (int (if (pos? pixel-distance) (/ moved pixel-distance) moved))]
+          change (if (pos? pixel-distance) (/ moved pixel-distance) moved)]
       (reset! (::dragged? state) false)
       (let [new-value (clamp lb (+ @(::start-value state) (* change step)) ub)]
         (publish output-stream new-value)))))
@@ -36,6 +36,7 @@
   (let [handlers @(::handlers state)]
     (js/removeEventListener "mousemove" (::move handlers))
     (js/removeEventListener "mouseup" (::up handlers)))
+  ; todo: simplify this
   (when @(::mouse-down? state)
     (reset! (::mouse-down? state) false)
     (.preventDefault event)

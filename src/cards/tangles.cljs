@@ -5,6 +5,7 @@
     [example.data :refer [bref* cref* update-b* update-c*]]
     [clojure.string :as string]
     [pubsub.feeds :refer [create-feed ->Topic]]
+    [cljs.test :refer-macros [is testing]]
     )
   (:require-macros
     [devcards.core :refer [defcard-doc defcard deftest]]
@@ -79,7 +80,8 @@
                 (swap! db* update-in [:a :c] (fn [_] value))))
 
   ```
-  Calling `tangle-numeric` then creates the react element:
+  Calling `tangle-numeric` then creates the react element. Here we ensure that the tangle steps by £1, returns an integer
+  value
   ```clojure
   (tangle-numeric bref* update-b*
                   {:minimum 0 :maximum 10 :step 1
@@ -90,11 +92,12 @@
   ###...yielding"
 
   (tangle-numeric bref* update-b*
-                  {:minimum 0 :maximum 10 :step 1
+                  {:minimum        0 :maximum 10 :step 1
                    :pixel-distance 5
-                   :format  #(str "£" %)
-                   :parse   #(js/parseInt (string/replace % #"\D" ""))})
-  )
+                   :format         #(str "£" (js/Math.round %))
+                   :parse          #(js/parseInt (string/replace % #"[^\d.]" ""))}))
+
+
 
 
 (defcard inline-tangle
@@ -130,4 +133,13 @@
   resulting in:"
   (core/tangle-card)
   )
+
+(deftest
+  just-checking
+  "##Docs here"
+  (testing
+    "success"
+    (is true "success")
+    "failure"
+    (is false "failure")))
 

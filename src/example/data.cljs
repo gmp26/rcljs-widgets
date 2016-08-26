@@ -12,10 +12,10 @@
 
 (subscribe update-b*
            (fn [_ value]
-             ;(println "update b " value)
-             (swap! db* update-in [:a :b] (fn [_] value))))
+             (println "update b " value)
+             (swap! db* update-in [:a :b] (fn [_] (js/Math.round value)))))
 
 (subscribe update-c*
            (fn [_ value]
-             ;(println "update c " value)
+             (println "update c " value)
              (swap! db* update-in [:a :c] (fn [_] value))))
