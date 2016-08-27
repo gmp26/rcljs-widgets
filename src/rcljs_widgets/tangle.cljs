@@ -31,12 +31,9 @@
   (let [handlers @(::handlers state)]
     (js/removeEventListener "mousemove" (::move handlers))
     (js/removeEventListener "mouseup" (::up handlers)))
-  ; todo: simplify this
-  (when @(::mouse-down? state)
-    (reset! (::mouse-down? state) false)
-    (.preventDefault event)
-    (if @(::dragged? state)
-      (reset! (::dragged? state) false))))
+  (reset! (::mouse-down? state) false)
+  (reset! (::dragged? state) false)
+  (.preventDefault event))
 
 (defn handle-change [event output-stream parse lb ub]
   (println "new value: " (parse (.. event -target -value)))

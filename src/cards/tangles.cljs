@@ -5,7 +5,7 @@
     [rcljs-widgets.tangle :refer [tangle-numeric inline-tangle]]
     [rcljs-widgets.wrapped-react-tangle-js :refer [js-tangletext wrap-js-tangletext]]
     [example.data :refer [bref* cref* d* update-b* update-c* update-d*]]
-    [clojure.string :as string]
+    [clojure.string :refer [replace]]
     [pubsub.feeds :refer [create-feed ->Topic]]
     [cljs.test :refer-macros [is testing]]
     )
@@ -90,7 +90,7 @@
   (tangle-numeric bref* update-b*
                   {:minimum 0 :maximum 10 :step 1
                    :format #(str \"£\" %)
-                   :parse #(js/parseInt (string/replace % #\"[^\\d.]\" \"\")})
+                   :parse #(js/parseInt (replace % #\"[^\\d.]\" \"\")})
   ```
 
   ###...yielding"
@@ -99,7 +99,7 @@
                   {:minimum        0 :maximum 10 :step 1
                    :pixel-distance 5
                    :format         #(str "£" (js/Math.round %))
-                   :parse          #(js/parseInt (string/replace % #"£" ""))}))
+                   :parse          #(js/parseInt (replace (str %) #"£" ""))}))
 
 (defcard inline-tangles
          "#Inline tangle usage
