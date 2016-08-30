@@ -14,10 +14,7 @@
                  [pubsub "0.1.0-SNAPSHOT"]
                  ]
 
-  :plugins [
-            ;[lein-figwheel "0.5.3-2"]
-            ;[[lein-git-deps "0.0.2-SNAPSHOT"]]
-            [lein-cljsbuild "1.1.3" :exclusions [org.clojure/clojure]]]
+  :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.clojure/clojure]]]
 
   ;:git-dependencies [["https://github.com/gmp26/pubsub.git"]]
 

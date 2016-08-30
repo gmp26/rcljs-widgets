@@ -30,13 +30,11 @@
         ub (if (< lb maximum) maximum (+ (* step 10)))
         validate (comp #(clamp lb % ub) parse)]
 
-
     (.createElement js/React js/TangleText #js
         {:value      (rum/react value) :min lb :max ub :step step
          :format     format
          :class-name class :pixel-distance pixel-distance
          :onChange   (fn [val] (publish output-stream (validate val)))
          }))
-
   )
 
