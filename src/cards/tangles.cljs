@@ -16,18 +16,24 @@
 ;; Visit http://localhost:3449/cards.html to see this
 
 (defcard-doc
-  "#Replicating Bret Victor's tanglekit in clojurescript.")
+  "#Replicating Bret Victor's tanglekit in clojurescript."
+  )
+
+(defcard
+  "##Tangle-numeric
+    Each `tangle-numeric` component is a little like a `type=\"range\"` input element where the value can be changed\n  by dragging it to the right or left. Double clicking on the value gives it focus and allows the user to enter numbers\n  or press the up and down keys to adjust."
+  (tangle-numeric bref* update-b*
+                  {:minimum        0 :maximum 10 :step 1
+                   :pixel-distance 5
+                   :format         #(str "£" (js/Math.round %))
+                   :parse          #(js/parseInt (replace (str %) #"£" ""))}))
 
 (defcard
   "##Tangle-numeric usage.
 
-  Each `tangle-numeric` component is a little like a `type=\"range\"` input element where the value can be changed
-  by dragging it to the right or left. Double clicking on the value gives it focus and allows the user to enter numbers
-  or press the up and down keys to adjust.
-
   It has two required parameters:
 
-  1. a reference to the value to be rendered, and
+  1. a ref to the value to be rendered, and
   1. a [topic feed](https://github.com/gmp26/pubsub) on which to report changes to that value.
 
   These may be followed by a map of optional parameters. Here they are with their default values:
