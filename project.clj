@@ -10,6 +10,7 @@
                  [org.clojure/clojurescript "1.8.51"]
                  [devcards "0.2.1-7"]
                  [rum "0.10.4"]
+                 [cljs-css-modules "0.1.1"]
                  [figwheel-sidecar "0.5.4-6"]
                  [pubsub "0.1.0-SNAPSHOT"]
                  ]

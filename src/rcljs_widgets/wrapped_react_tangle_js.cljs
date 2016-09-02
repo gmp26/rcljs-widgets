@@ -6,13 +6,12 @@
 (enable-console-print!)
 
 (rum/defc js-tangletext []
-          [:div
-           (.createElement js/React js/TangleText #js {:value 6 :min 0 :max 10 :step 0.1 :onChange #(.log js/console %1)})
-           ])
+  (.createElement js/React js/TangleText #js {:value 6 :min 0 :max 10 :step 0.1 :onChange #(.log js/console %1)})
+  )
 
 
-(rum/defcs wrap-js-tangletext < rum/reactive
-  [state value output-stream &
+(rum/defc wrap-js-tangletext < rum/reactive
+  [value output-stream &
    [{:keys [minimum maximum step
             pixel-distance class
             format
@@ -35,6 +34,5 @@
          :format     format
          :class-name class :pixel-distance pixel-distance
          :onChange   (fn [val] (publish output-stream (validate val)))
-         }))
-  )
+         })))
 

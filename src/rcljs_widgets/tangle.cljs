@@ -4,38 +4,69 @@
   Bret Victor. The concept is  heavily used in Adobe user interfaces."
   (:require
     [rum.core :as rum]
-    [pubsub.feeds :as feeds :refer [publish]]
+    [pubsub.feeds :refer [publish]]
+    [events.pointers :refer [event-x]]
     [rcljs-widgets.utils :refer [clamp]]
+    [cljs-css-modules.macro :refer-macros [defstyle]]
     ))
 
-(defn handle-down [event state value]
+;;;
+;; Using cljs-css-modules to localise component styles - this allows all html, css and js to be defined for this
+;; component in one file. :)
+;;;
+(defstyle styles
+  [
+   [".tangle" {:border        0
+               :text-align    "center"
+               :cursor        "col-resize"
+               :font          "inherit"
+               :border-bottom "2px dotted #88f"
+               :display       "inline"
+               :width         "40px"
+               :color         "#88f"
+               }]
+
+   [".tangle:focus" {:cursor "text"}]
+   ])
+
+
+;;;
+;; Basic event handling follows the usual reactjs pattern. However, since this component needs dragging to work
+;; beyond its own screen boundary, we have to attach and remove window event handlers manually. State related to dragging
+;; is uninteresting to the app so we keep it local.
+;;;
+(defn- handle-down [event state value]
   (when (and (zero? (.-button event)) (not= (.-target event) (.-activeElement js/document)))
     (.preventDefault event)
     (reset! (::mouse-down? state) true)
     (reset! (::dragged? state) false)
-    (reset! (::start-x state) (.-screenX event))
+    (reset! (::start-x state) (event-x event))
     (reset! (::start-value state) @value)
     (let [handlers @(::handlers state)]
-      (.addEventListener js/window "mousemove" (::move handlers))
-      (.addEventListener js/window "mouseup" (::up handlers)))))
+      (doseq [type ["mousemove" "touchmove"]]
+        (js/addEventListener type (::move handlers)))
+      (doseq [type ["mouseup" "touchend"]]
+        (js/addEventListener type (::up handlers))))))
 
-(defn handle-move [event state output-stream validate step pixel-distance]
+(defn- handle-move [event state output-stream validate step pixel-distance]
   (when @(::mouse-down? state)
-    (let [moved (- (.-screenX event) @(::start-x state))
+    (let [moved (- (event-x event) @(::start-x state))
           change (if (pos? pixel-distance) (/ moved pixel-distance) moved)]
       (reset! (::dragged? state) false)
       (let [new-value (validate (+ @(::start-value state) (* change step)))]
         (publish output-stream new-value)))))
 
-(defn handle-up [event state]
+(defn- handle-up [event state]
   (let [handlers @(::handlers state)]
-    (js/removeEventListener "mousemove" (::move handlers))
-    (js/removeEventListener "mouseup" (::up handlers)))
+    (doseq [type ["mousemove" "touchmove"]]
+      (js/removeEventListener type (::move handlers)))
+    (doseq [type ["mouseup" "touchend"]]
+      (js/removeEventListener type (::up handlers))))
   (reset! (::mouse-down? state) false)
   (reset! (::dragged? state) false)
   (.preventDefault event))
 
-(defn handle-change [event output-stream parse lb ub]
+(defn- handle-change [event output-stream parse lb ub]
   (println "new value: " (parse (.. event -target -value)))
   (publish output-stream (clamp lb (parse (.. event -target -value)) ub)))
 
@@ -45,7 +76,7 @@
                             (rum/local 0 ::start-x)
                             (rum/local 0 ::start-value)
                             (rum/local {} ::handlers)
-  [state value output-stream &           ;value is a number, output-stream is a pubsub topic
+  [state value output-stream &                              ;value is a number, output-stream is a pubsub topic
    [{:keys [minimum maximum step
             pixel-distance class
             format
@@ -65,19 +96,19 @@
     (reset! (::handlers state)
             {::move #(handle-move %1 state output-stream validate step pixel-distance)
              ::up   #(handle-up %1 state)})
-    [:input {:class           class
+    [:input {:class-name      (:tangle styles)
              :type            "text"
              :value           (format (rum/react value))
              :min             lb
              :max             ub
              :step            step
-             :style           {:width "50px"}               ; todo - find a good way to size things
              :on-change       #(handle-change % output-stream validate lb ub)
              :on-mouse-down   #(handle-down %1 state value)
+             :on-touch-start  #(handle-down %1 state value)
              :on-double-click #(.focus (.-target %))
              :on-blur         #(handle-change % output-stream validate lb ub)}]))
 
-(rum/defc inline-tangle < rum/static [value output-stream]
-  [:span "Embedding a tangle " (tangle-numeric value output-stream) " inline. To change the value, drag the number
+(rum/defc inline-tangle < rum/static [value output-stream & [options]]
+  [:span "Embedding a tangle " (tangle-numeric value output-stream options) " inline. To change the value, drag the number
   to left or right. Edit by double clicking on it to gain focus. When the input has focus, up and down keys will step the value up or down and numeric keys will be entered. The widget emits the final value when focus is lost and when it changes."]
   )
