@@ -13,7 +13,7 @@
   )
 
 (defn mount-component [el fill]
-  (rum/mount (square fill "100%") el))
+  (rum/mount (square fill "100px") el))
 
 (defn resize-component [el fill width height]
   (rum/mount (rect fill width height) el))
@@ -23,9 +23,11 @@
 ;;;
 ;
 ; todo: test this alternative:
-; (def ^:external cljsWidgets {:filled_rectangle {:render mount-component :resize resize-component}}
+(def ^:external cljsWidgets
+  (clj->js {:filled_rectangle {:render mount-component
+                               :resize resize-component}}))
 ;
-(set! (.-cljsWidgets js/window)
+#_(set! (.-cljsWidgets js/window)
       (clj->js {:filled_rectangle {:render mount-component
                                    :resize resize-component}}))
 
