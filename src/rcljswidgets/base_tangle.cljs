@@ -1,12 +1,13 @@
-(ns rcljs-widgets.tangle
-  "A simple tangle is a numeric input which allows the number to be adjusted by dragging. On double click, the tangle
+(ns rcljswidgets.base-tangle
+
+  "A basic tangle modelled onis a numeric input which allows the number to be adjusted by dragging. On double click, the tangle
   behaves like an ordinary numeric input, responding to keyboard number entry and up and down keys. The name is due to
   Bret Victor. The concept is  heavily used in Adobe user interfaces."
   (:require
     [rum.core :as rum]
     [pubsub.feeds :refer [publish]]
     [events.pointers :refer [event-x]]
-    [rcljs-widgets.utils :refer [clamp]]
+    [rcljswidgets.utils :refer [clamp]]
     [cljs-css-modules.macro :refer-macros [defstyle]]
     ))
 

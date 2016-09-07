@@ -1,9 +1,7 @@
 (ns cards.js-wrapped-tangletext
   (:require
     [rum.core :as rum]
-    [rcljs-widgets.core :as core]
-    [rcljs-widgets.tangle :refer [tangle-numeric inline-tangle]]
-    [rcljs-widgets.wrapped-react-tangle-js :refer [js-tangletext wrap-js-tangletext]]
+    [rcljswidgets.wrapped-react-tangle-js :refer [js-tangletext wrap-js-tangletext]]
     [example.data :refer [bref* cref* d* update-b* update-c* update-d*]]
     [clojure.string :refer [replace]]
     [pubsub.feeds :refer [create-feed ->Topic]]

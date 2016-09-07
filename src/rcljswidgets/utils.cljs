@@ -1,4 +1,4 @@
-(ns rcljs-widgets.utils)
+(ns rcljswidgets.utils)
 
 
 (defn clamp [lb value ub & [default]]

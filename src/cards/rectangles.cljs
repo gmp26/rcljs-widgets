@@ -2,7 +2,7 @@
   (:require
     [rum.core :as rum]
     [cljs.test :as t]
-    [rcljs-widgets.rectangles :as rects]
+    [rcljswidgets.rectangles :as rects]
     )
   (:require-macros
     [devcards.core :as dc :refer [defcard-doc defcard deftest]]

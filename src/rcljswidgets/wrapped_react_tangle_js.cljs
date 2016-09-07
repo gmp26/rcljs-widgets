@@ -1,7 +1,7 @@
-(ns rcljs-widgets.wrapped-react-tangle-js
+(ns rcljswidgets.wrapped-react-tangle-js
   (:require [rum.core :as rum]
             [pubsub.feeds :refer [publish]]
-            [rcljs-widgets.utils :refer [clamp]]))
+            [rcljswidgets.utils :refer [clamp]]))
 
 (enable-console-print!)
 

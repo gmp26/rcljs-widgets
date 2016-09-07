@@ -1,7 +1,7 @@
-(ns rcljs-widgets.core
+(ns rcljswidgets.core
   (:require
     [rum.core :as rum]
-    [rcljs-widgets.rectangles :refer [square rect]]
+    [rcljswidgets.rectangles :refer [square rect]]
     ))
 
 (enable-console-print!)

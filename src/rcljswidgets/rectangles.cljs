@@ -1,12 +1,14 @@
-(ns rcljs-widgets.rectangles
+(ns rcljswidgets.rectangles
   (:require [rum.core :as rum]))
 
-(rum/defc square [fill width]
+(rum/defc ^:export square [fill width]
+  "Draw a square with a given fill"
   [:div {:style {:width            width
                  :height           width
                  :background-color fill}}])
 
-(rum/defc rect [fill width height]
+(rum/defc ^:export rect [fill width height]
+  "Draw a rectangle of width and height pixels. Also allow height as a percentage of width"
   [:div (let [w (if (number? width)
                   (str width "px") width)
               h_map (if (number? height)
@@ -17,3 +19,4 @@
           {:style (merge {:width            w
                           :background-color fill}
                          h_map)})])
+
