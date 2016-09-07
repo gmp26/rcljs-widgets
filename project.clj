@@ -1,6 +1,6 @@
-(defproject rcljswidgets "0.1.0-SNAPSHOT"
+(defproject rcljs-widgets "0.1.0-SNAPSHOT"
   :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+  :url "http://github.com/gmp26/rcljs-widgets"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
