@@ -7,6 +7,7 @@
     [cards.js-wrapped-tangletext]
     [tests.check-tests]
     [cards.app-state]
+    [cards.funnel]
     ))
 
 (defn ^:export main []
