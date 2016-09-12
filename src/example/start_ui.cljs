@@ -1,6 +1,7 @@
 (ns example.start-ui
   (:require
     [devcards.core]
+    [cards.shiny-dimensions]
     [cards.rectangles]
     [cards.tangles]
     [cards.js-tangletext]
