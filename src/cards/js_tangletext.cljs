@@ -32,5 +32,5 @@
   resulting in:"
   (js-tangletext)
   #_(wrap-js-tangletext cref* update-c*
-                      {:minimum 0 :maximum 10 :step 0.1})
+                        {:minimum 0 :maximum 10 :step 0.1})
   )
