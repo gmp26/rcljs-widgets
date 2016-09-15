@@ -1,5 +1,12 @@
 (ns alg.binom)
 
+;;;
+;; Loaders algorithm for the binomial distribution
+;;
+;; http://savannah.gnu.org/bugs/download.php?file_id=24016
+;;;
+
+;; Accuracy is excessive for V8 at the moment (limit of 17 sig fig)
 (def PI2 6.283185307179586476925286)
 (def S0 0.083333333333333333333)                            ; 1/12 
 (def S1 0.00277777777777777777778)                          ; 1/360
@@ -36,18 +43,46 @@
 ;; Evaluate the deviance term
 ;; bd0(x,np) = x log(x/np) + np - x
 ;;;
-;(defn bd0 [x np]
-;  (if (< (fabs (- x np)) (* 0.1 (+ x np))))
-;  {s = (x-np) * (x-np) / (x+np)                             ;
-;   v = (x-np) / (x+np)                                      ;
-;   ej = 2*x*v                                               ;
-;   for (j=1; ;j++)
-;         {
-;          ej *= v*v                                         ;
-;             s1 = s+ej /) (2*j+1)                           ;
-;   if (s1==s) return (s1)                                   ;
-;   s = s1                                                   ;
-;   }
-;
-;  return(x*log(x/np)+np-x);
-;}
+(defn bd0 [x np]
+  (let [x-np (- x np)
+        x+np (+ x np)]
+    (if (< (fabs x-np) (* 0.1 x+np))
+      (let [s (/ (* x-np x-np) x+np)
+            v (/ x-np x+np)
+            v2 (* v v)]
+        (loop [ej (* 2 x v v2) j 1]
+          (let [s1 (+ s (/ ej (inc (* 2 j))))]
+            (prn "s=", s, " s1=",s1)
+            (if (= s s1)                                    ; (< (fabs (- (/ s1 s) 1)) 1e-16)     ;; use fabs here?
+              s1
+              (recur (* ej v2) (inc j))))))
+      (+ (* x (Math.log (/ x np))) np (- x)))))
+
+;;;
+;; Evaluate dbinom
+;;;
+(defn dbinom [x n p]
+  (if (zero? p)
+    (if (zero? x) 1 0)
+    (if (= 1 p)
+      (if (= n x) 1 0)
+      (if (zero? x)
+        (Math.exp (* n (Math.log (- 1 p))))
+        (if (= x n)
+          (Math.exp (* n (Math.log p)))
+          (* (Math.exp (- (stirlerr n)
+                          (stirlerr x)
+                          (stirlerr (- n x))
+                          (bd0 x (* n p))
+                          (bd0 (- n x) (* n (- 1 p)))))
+             (Math.sqrt (/ n (* PI2 x (- n x))))))))))
+
+;;;
+;; Evaluate dpois
+;;;
+(defn dpois [x lb]
+  (if (zero? lb)
+    (if (zero? x) 1 0)
+    (if (zero? x)
+      (Math.exp (- lb))
+      (/ (Math.exp (- (stirlerr x) (bd0 x lb))) (Math.sqrt (* PI2 x))))))
