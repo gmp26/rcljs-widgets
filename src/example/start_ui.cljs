@@ -9,6 +9,7 @@
     [tests.check-tests]
     [cards.app-state]
     [cards.funnel]
+    [tests.dbinom]
     ))
 
 (defn ^:export main []

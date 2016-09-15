@@ -34,7 +34,7 @@
         (> n 500) (/ (- S0 (/ S1 nn)) n)
         (> n 80) (/ (- S0 (/ (- S1 (/ S2 nn)) nn)) n)
         (> n 35) (/ (- S0 (/ (- S1 (/ (- S2 (/ S3 nn)) nn)) nn)) n)
-        :else (/ (- S0 (- S1 (/ (- S2 (/ (- S3 (/ S4 nn)) nn)) nn)) nn) n)))))
+        :else (/ (- S0 (/ (- S1 (/ (- S2 (/ (- S3 (/ S4 nn)) nn)) nn)) nn)) n)))))
 
 (defn fabs [r]
   (if (pos? r) r (- r)))
@@ -47,15 +47,14 @@
   (let [x-np (- x np)
         x+np (+ x np)]
     (if (< (fabs x-np) (* 0.1 x+np))
-      (let [s (/ (* x-np x-np) x+np)
+      (let [
             v (/ x-np x+np)
             v2 (* v v)]
-        (loop [ej (* 2 x v v2) j 1]
+        (loop [ej (* 2 x v v v) j 1 s (/ (* x-np x-np) x+np)]
           (let [s1 (+ s (/ ej (inc (* 2 j))))]
-            (prn "s=", s, " s1=",s1)
-            (if (= s s1)                                    ; (< (fabs (- (/ s1 s) 1)) 1e-16)     ;; use fabs here?
+            (if (= s s1)
               s1
-              (recur (* ej v2) (inc j))))))
+              (recur (* ej v2) (inc j) s1)))))
       (+ (* x (Math.log (/ x np))) np (- x)))))
 
 ;;;
@@ -86,3 +85,18 @@
     (if (zero? x)
       (Math.exp (- lb))
       (/ (Math.exp (- (stirlerr x) (bd0 x lb))) (Math.sqrt (* PI2 x))))))
+
+;;;
+;; direct multiplication for checking
+;;;
+(defn dbinom-mult [x n p]
+  (if (> (* 2 x) n)
+    (dbinom-mult (- n x) (- 1 p))
+    (loop [f 1 j0 0 j1 0 j2 0]
+      (if (or (< j0 x) (< j1 x) (< j2 (- n x)))
+        (if (and (< j0 x) (< f 1))
+          (recur (* f (/ (+ (- n x) j0) j0)) (inc j0) j1 j2)
+          (if (< j1 x)
+            (recur (* f p) j0 (inc j1) j2)
+            (recur (* f (- 1 p)) j0 j1 (inc j2))))
+        f ))))
