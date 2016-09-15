@@ -47,14 +47,15 @@
   (let [x-np (- x np)
         x+np (+ x np)]
     (if (< (fabs x-np) (* 0.1 x+np))
-      (let [v (/ x-np x+np)
-            s (* x-np v)]
-        (loop [ej (* 2 x v v v)
-               j 1]
-          (let [s1 (/ (+ s ej) (inc (* 2 j)))]
-            (if (= s1 s)                                    ;; use fabs here?
+      (let [s (/ (* x-np x-np) x+np)
+            v (/ x-np x+np)
+            v2 (* v v)]
+        (loop [ej (* 2 x v v2) j 1]
+          (let [s1 (+ s (/ ej (inc (* 2 j))))]
+            (prn "s=", s, " s1=",s1)
+            (if (= s s1)                                    ; (< (fabs (- (/ s1 s) 1)) 1e-16)     ;; use fabs here?
               s1
-              (recur (* ej v v) (inc j))))))
+              (recur (* ej v2) (inc j))))))
       (+ (* x (Math.log (/ x np))) np (- x)))))
 
 ;;;
