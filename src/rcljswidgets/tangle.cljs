@@ -12,22 +12,23 @@
 
 ;;;
 ;; Using cljs-css-modules to localise component styles - this allows all html, css and js to be defined for this
-;; component in one file. :)
+;; component in one file.
 ;;;
-(defstyle styles
-  [
-   [".tangle" {:border        0
-               :text-align    "center"
-               :cursor        "col-resize"
-               :font          "inherit"
-               :border-bottom "2px dotted #88f"
-               :display       "inline"
-               :width         "40px"
-               :color         "#88f"
-               }]
 
-   [".tangle:focus" {:cursor "text"}]
-   ])
+(defstyle styles
+          [
+           [".tangle" {:border        0
+                       :text-align    "center"
+                       :cursor        "col-resize"
+                       :font          "inherit"
+                       :border-bottom "2px dotted #88f"
+                       :display       "inline"
+                       :width         "40px"
+                       :color         "#88f"
+                       }]
+
+           [".tangle:focus" {:cursor "text"}]
+           ])
 
 
 ;;;
