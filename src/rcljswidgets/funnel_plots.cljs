@@ -1,7 +1,6 @@
 (ns rcljswidgets.funnel-plots
   (:require [rum.core :as rum]
             [clojure.string :as s]
-            [garden.selectors :refer-macros [defselector]]
             [cljs-css-modules.macro :refer-macros [defstyle]]))
 
 (def data nil)

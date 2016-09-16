@@ -11,7 +11,6 @@
                  [cljsjs/react-dom "0.14.3-1"]              ; see https://github.com/bhauman/devcards/issues/106 for why
                  [devcards "0.2.1-7"]
                  [rum "0.10.4"]
-                 [garden "1.3.2"]
                  [cljs-css-modules "0.1.1"]
                  [figwheel-sidecar "0.5.4-6"]
                  [pubsub "0.2.1"]
@@ -68,4 +67,4 @@
                                        :externs       ["externs/exported.js"]
                                        :optimizations :whitespace}}]}
 
-  :figwheel) {:css-dirs ["resources/public/css"]}
+  :figwheel {:css-dirs ["resources/public/css"]})
