@@ -14,4 +14,12 @@
 
     (let [linear (->Linear [0 100] [0 200])]
       (is (= ((i->o linear) 50) 100)  "linear scale")
-      (is (= ((o->i linear) 100) 50) "inverse linear scale"))))
+      (is (= ((o->i linear) 100) 50) "inverse linear scale"))
+
+    (let [linear (->Linear [0 100] [-200 0])]
+      (is (= ((i->o linear) 50) -100)  "linear scale")
+      (is (= ((o->i linear) -100) 50) "inverse linear scale"))
+
+    (let [linear (->Linear [100 200] [-200 -100])]
+      (is (= ((i->o linear) 150) -150)  "linear scale")
+      (is (= ((o->i linear) -150) 150) "inverse linear scale"))))

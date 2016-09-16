@@ -2,8 +2,8 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]
-            [svg.axes :refer [axisBottom]]
-            [svg.scales :refer [->Identity]]))
+            [svg.axes :refer [axisBottom axisLeft]]
+            [svg.scales :refer [->Identity ->Linear]]))
 
 
 (defstyle styles
@@ -34,7 +34,7 @@
      :width   width
      :height  height
      :x       (->Identity [0 width])
-     :y       (->Identity [0 height])
+     :y       (->Linear [0 height] [(- height) 0])
      }))
 
 (rum/defc start-marker []
@@ -44,8 +44,7 @@
             :ref-y 5
             :marker-width -6
             :marker-height 6
-            :orient "auto"
-            }
+            :orient "auto"}
    [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
 
 (rum/defc end-marker []
@@ -55,8 +54,7 @@
             :ref-y 5
             :marker-width 6
             :marker-height 6
-            :orient "auto"
-            }
+            :orient "auto"}
    [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
 
 (rum/defc svg2 [{:keys [outer margin inner padding width height x y]
@@ -82,7 +80,10 @@
              :height height}]
      [:g {:class-name ".xaxis"
           :transform (str "translate(0," height ")")}
-      (axisBottom {:scale x :ticks (range 0 width (/ width 10))})]]
+      (axisBottom {:scale x :ticks (range 0 (+ width (/ width 9)) (/ width 9))})]
+     [:g {:class-name ".yaxis"
+          :transform (str "translate(0,0)")}
+      (axisLeft {:scale y :ticks (range 0 (+ height) (/ height 8))})]]
     ]
    ])
 

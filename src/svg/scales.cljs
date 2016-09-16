@@ -12,12 +12,12 @@
     (fn [x]
       (let [[x1 x2] (:in this)
             [y1 y2] (:out this)]
-        (* (/ (- x x1) (- x2 x1)) (- y2 y1)))))
+        (+ y1 (* (/ (- x x1) (- x2 x1)) (- y2 y1))))))
   (o->i [this]
     (fn [y]
       (let [[x1 x2] (:in this)
             [y1 y2] (:out this)]
-        (* (/ (- y y1) (- y2 y1)) (- x2 x1)))))
+        (+ x1 (* (/ (- y y1) (- y2 y1)) (- x2 x1))))))
   (in [this] (:in this))
   (out [this] (:out this)))
 
