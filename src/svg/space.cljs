@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [svg.axes :refer [axisBottom axisLeft]]
-            [svg.scales :refer [->Identity ->Linear]]))
+            [svg.scales :refer [->Identity ->Linear i->o o->i]]))
 
 
 (defstyle styles
@@ -34,7 +34,7 @@
      :width   width
      :height  height
      :x       (->Identity [0 width])
-     :y       (->Linear [0 height] [(- height) 0])
+     :y       (->Linear [0 height] [height 0])
      }))
 
 (rum/defc start-marker []
@@ -79,11 +79,11 @@
              :width width
              :height height}]
      [:g {:class-name ".xaxis"
-          :transform (str "translate(0," height ")")}
+          :transform  (str "translate(0," ((i->o y) -10) ")")}
       (axisBottom {:scale x :ticks (range 0 (+ width (/ width 9)) (/ width 9))})]
      [:g {:class-name ".yaxis"
-          :transform (str "translate(0,0)")}
-      (axisLeft {:scale y :ticks (range 0 (+ height) (/ height 8))})]]
+          :transform (str "translate(-10,0)")}
+      (axisLeft {:scale y :ticks (range 0 (+ height (/ height 8)) (/ height 8))})]]
     ]
    ])
 
