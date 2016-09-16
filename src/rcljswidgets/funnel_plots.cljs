@@ -13,7 +13,10 @@
 
 
 (defstyle styles
-          [[".axis" {:stroke-width 4
+          [[".svg-box" {:padding 0
+                        :margin  0
+                        :background-color "#fee"}]
+           [".axis" {:stroke-width 4
                      :stroke       "#000"}]
            [".tick" {:stroke-width 4
                      :stroke       "#000"}]])
@@ -27,19 +30,23 @@
   (case
     (= position :bottom)
     [:g
-     [:line {:x1         lb
+     [:line {:key        "X"
+             :x1         lb
              :x2         ub
              :class-name (:axis styles)}]
      (for [tick ticks]
-       [:line {:x1 tick :y1 0 :x2 tick :y2 100 :class-name (:tick styles)}])
+       [:line {:key (gensym "K") :x1 tick :y1 0 :x2 tick :y2 100 :class-name (:tick styles)}])
      ]))
 
 (rum/defc svg-container [width height content & [[xmin ymin xmax ymax :as view-box]]]
-  [:svg {:width    width
-         :height   height
-         :view-box (s/join " " (map str view-box))}
-   (content)
-   ])
+  (let [attrs {:width      width
+               :height     height
+               :class-name (:svg-box styles)}]
+    [:svg (if view-box
+            (merge attrs {:view-box (s/join " " view-box)})
+            attrs)
+     (content)
+     ]))
 
 
 

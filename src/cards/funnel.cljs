@@ -1,6 +1,7 @@
 (ns cards.funnel
   (:require [pubsub.feeds :refer [create-feed ->Topic]]
             [cljs.test :refer-macros [is testing]]
+            [cljs-css-modules.macro :refer-macros [defstyle]]
             [devcards.core :refer-macros [defcard-doc defcard deftest]]
             [rcljswidgets.funnel-plots :refer [test-plot svg-container axis]]
             [alg.binom :as alg]))
@@ -24,4 +25,6 @@
                                  :ub 5000
                                  :ticks (range 0 6000 1000)
                                  :title "Number of operations per hospital"})
-                 [0 0 5000 400]))
+                 [-200 0 5400 400]))
+
+

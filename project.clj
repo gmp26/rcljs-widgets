@@ -68,4 +68,4 @@
                                        :externs       ["externs/exported.js"]
                                        :optimizations :whitespace}}]}
 
-  :figwheel {:css-dirs ["resources/public/css"]})
+  :figwheel) {:css-dirs ["resources/public/css"]}
