@@ -16,7 +16,7 @@
 
 
 (rum/defc axisBottom [{:keys [scale ticks formatter]
-                       :or   {scale (->Identity [0 1])
+                       :or   {scale (->Identity [0 1] 10)
                               ticks (range 0 1 0.1)
                               formatter #(.toFixed (js/Number. %) 0)}}]
   (let [[x1 x2] (in scale)
@@ -46,7 +46,7 @@
                 } (formatter tick)]])]))
 
 (rum/defc axisLeft [{:keys [scale ticks formatter]
-                     :or   {scale (->Identity [0 1])
+                     :or   {scale (->Identity [0 1] 10)
                             ticks (range 0 1 0.1)
                             formatter #(.toFixed (js/Number. %) 0)}}]
   (let [[y1 y2] (in scale)

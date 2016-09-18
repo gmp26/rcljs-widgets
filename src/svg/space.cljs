@@ -2,9 +2,9 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]
-            [svg.ticks :refer [ticks]]
+    ;[svg.ticks :refer [ticks]]
             [svg.axes :refer [axisBottom axisLeft]]
-            [svg.scales :refer [->Identity ->Linear i->o o->i in out]]
+            [svg.scales :refer [->Identity nice-linear i->o o->i in out ticks]]
             ))
 
 
@@ -27,10 +27,8 @@
      :padding padding
      :width   width
      :height  height
-     :x       (->Linear [200 -100] [0 width])
-     :x-ticks (ticks 200 -100 8)
-     :y       (->Linear [200 -100] [height 0])
-     :y-ticks (ticks 200 -100 5)
+     :x       (nice-linear [200 -100] [0 width] 5)
+     :y       (nice-linear [200 -100] [height 0] 5)
      }))
 
 (rum/defc start-marker []
@@ -53,16 +51,17 @@
             :orient        "auto"}
    [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
 
-(rum/defc margins [{:keys [outer margin inner padding width height x x-ticks y y-ticks]}]
+(rum/defc margins [{:keys [outer margin inner padding width height x y]}]
   (let [inner (if (nil? inner) {:width  (- (:width outer) (:left margin) (:right margin))
                                 :height (- (:height outer) (:top margin) (:bottom margin))}
                                inner)
         width (if (nil? width) (- (:width inner) (:left padding) (:right padding)) width)
         height (if (nil? height) (- (:height inner) (:top padding) (:bottom padding)) height)
-        x (if (nil? x) (->Identity [0 width]) x)
-        x-ticks (if (nil? x-ticks) (ticks 0 width 10) x-ticks)
-        y (if (nil? y) (->Identity [0 height]) y)
-        y-ticks (if (nil? y-ticks) (ticks 0 height 5) y-ticks)]
+        x (if (nil? x) (->Identity [0 width] 10) x)
+        x-ticks (ticks x)                                   ;(if (nil? x-ticks) (ticks 0 width 10) x-ticks)
+        y (if (nil? y) (->Identity [0 height] 10) y)
+        y-ticks (ticks y)                                   ;(if (nil? y-ticks) (ticks 0 height 5) y-ticks)
+        ]
 
     [:svg {:width  (:width outer)
            :height (:height outer)}

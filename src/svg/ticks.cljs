@@ -4,8 +4,8 @@
 (def e5 (Math.sqrt 10))
 (def e2 (Math.sqrt 2))
 
-(defn tick-step [start stop length]
-  (let [step0 (/ (Math.abs (- stop start)) (max 0 length))
+(defn tick-step [start stop preferred-count]
+  (let [step0 (/ (Math.abs (- stop start)) (max 0 preferred-count))
         step1 (Math.pow 10 (Math.floor (/ (Math.log step0) Math.LN10)))
         error (/ step0 step1)
         step (cond
@@ -15,8 +15,8 @@
                :else step1)]
     (if (< stop start) (- step) step)))
 
-(defn ticks [start stop length]
-  (let [step (tick-step start stop length)]
+(defn ticks [start stop preferred-count]
+  (let [step (tick-step start stop preferred-count)]
     (range
       (* (Math.ceil (/ start step)) step)
       (+ (* (Math.floor (/ stop step)) step) (/ step 2))

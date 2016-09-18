@@ -10,7 +10,7 @@
     [cards.app-state]
     ;[cards.funnel]
     [cards.margins]
-    [tests.space]
+    [tests.scales]
     [tests.dbinom]
     ))
 
