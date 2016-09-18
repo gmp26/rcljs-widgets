@@ -16,7 +16,7 @@
                       :stroke-width 0.5
                       :stroke-dasharray "3, 4"}]])
 
-(defn space [outer margin padding]
+(defn space [outer margin padding x-domain x-ticks y-domain y-ticks]
   (let [inner {:width  (- (:width outer) (:left margin) (:right margin))
                :height (- (:height outer) (:top margin) (:bottom margin))}
         width (- (:width inner) (:left padding) (:right padding))
@@ -27,8 +27,8 @@
      :padding padding
      :width   width
      :height  height
-     :x       (nice-linear [200 -100] [0 width] 5)
-     :y       (nice-linear [200 -100] [height 0] 5)
+     :x       (nice-linear x-domain [0 width] x-ticks)
+     :y       (nice-linear y-domain [height 0] y-ticks)
      }))
 
 (rum/defc start-marker []

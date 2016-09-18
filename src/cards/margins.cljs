@@ -13,7 +13,17 @@
 
 (defcard
   "margins"
-  (margins (space outer margin padding)))
+  (margins (space outer margin padding [0 200] 10 [1 100] 5)))
 
+(defcard
+  "axes spanning 0"
+  (margins (space outer margin padding [-200 200] 10 [-100 100] 5)))
 
+(defcard
+  "reversed scales spanning 0"
+  (margins (space outer margin padding [200 -200] 10 [100 -100] 5)))
+
+(defcard
+  "nicely calculated ticks from data in [23 3200] [10.2 10.5]"
+  (margins (space outer margin padding [23 3200] 10 [10.2 10.5] 5)))
 
