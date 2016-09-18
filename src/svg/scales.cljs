@@ -1,5 +1,4 @@
-(ns svg.scales
-  (:require [svg.ticks :as ts]))
+(ns svg.scales)
 
 (defprotocol IScale
   (i->o [_])
@@ -9,8 +8,33 @@
   (ticks [_])
   )
 
+(def e10 (Math.sqrt 50))
+(def e5 (Math.sqrt 10))
+(def e2 (Math.sqrt 2))
+
+(defn tick-step [start stop preferred-count]
+  (let [step0 (/ (Math.abs (- stop start)) (max 0 preferred-count))
+        step1 (Math.pow 10 (Math.floor (/ (Math.log step0) Math.LN10)))
+        error (/ step0 step1)
+        step (cond
+               (>= error e10) (* 10 step1)
+               (>= error e5) (* 5 step1)
+               (>= error e2) (* 2 step1)
+               :else step1)]
+    (if (< stop start) (- step) step)))
+
+(defn preferred-ticks [start stop preferred-count]
+  (let [step (tick-step start stop preferred-count)]
+    (range
+      (* (Math.ceil (/ start step)) step)
+      (+ (* (Math.floor (/ stop step)) step) (/ step 2))
+      step)))
+
+
+
+
 (defn- scale-ticks [a-scale tick-count]
-  (apply ts/ticks (conj (:in a-scale) tick-count)))
+  (apply preferred-ticks (conj (:in a-scale) tick-count)))
 
 (defrecord Identity [in tick-count]
   IScale
@@ -25,10 +49,10 @@
 (defn- linear-nice [[start stop :as input] & [p-count]]
   "Return a nice domain given an "
   (let [n (if (nil? p-count) 10 p-count)
-        step (ts/tick-step start stop n)]
+        step (tick-step start stop n)]
     (if (not (or (js/isNaN step) (nil? step)))
 
-      (let [step (ts/tick-step (* (Math.floor (/ start step)) step)
+      (let [step (tick-step (* (Math.floor (/ start step)) step)
                                (* (Math.ceil (/ stop step)) step)
                                n)]
         [(* (Math.floor (/ start step)) step)

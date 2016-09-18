@@ -2,7 +2,6 @@
   (:require
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
-    [svg.ticks :as ts]
     [svg.scales :refer [->Identity ->Linear i->o o->i nice-linear ticks]]
     ))
 

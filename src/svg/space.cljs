@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]
-    ;[svg.ticks :refer [ticks]]
             [svg.axes :refer [axisBottom axisLeft]]
             [svg.scales :refer [->Identity nice-linear i->o o->i in out ticks]]
             ))
