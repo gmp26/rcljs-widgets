@@ -3,7 +3,7 @@
             [cljs.test :refer-macros [is testing]]
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [devcards.core :refer-macros [defcard-doc defcard deftest]]
-            [svg.space :refer [svg2 space]]))
+            [svg.space :refer [margins space]]))
 
 (enable-console-print!)
 
@@ -13,7 +13,7 @@
 
 (defcard
   "margins"
-  (svg2 (space outer margin padding)))
+  (margins (space outer margin padding)))
 
 
 

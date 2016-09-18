@@ -2,24 +2,18 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]
+            [svg.ticks :refer [ticks]]
             [svg.axes :refer [axisBottom axisLeft]]
-            [svg.scales :refer [->Identity ->Linear i->o o->i]]))
+            [svg.scales :refer [->Identity ->Linear i->o o->i in out]]
+            ))
 
 
 (defstyle styles
-          [[".svg-box" {:padding          0
-                        :margin           0
-                        :background-color "#fee"}]
-           [".axis" {:fill            "none"
-                     :stroke-width    4
-                     :stroke          "#000"
-                     :shape-rendering "crispEdges"}]
-           [".tick" {:stroke-width 4
-                     :stroke       "#000"}]
-           [".outer" {:fill   "pink"
+          [[".outer" {:fill   "none"
                       :stroke "#000"}]
-           [".inner" {:fill "#CCC"
-                      :stroke "#000"
+           [".inner" {:fill             "#ccc"
+                      :stroke           "#000"
+                      :stroke-width 0.5
                       :stroke-dasharray "3, 4"}]])
 
 (defn space [outer margin padding]
@@ -33,59 +27,67 @@
      :padding padding
      :width   width
      :height  height
-     :x       (->Identity [0 width])
-     :y       (->Linear [0 height] [height 0])
+     :x       (->Linear [200 -100] [0 width])
+     :x-ticks (ticks 200 -100 8)
+     :y       (->Linear [200 -100] [height 0])
+     :y-ticks (ticks 200 -100 5)
      }))
 
 (rum/defc start-marker []
-  [:marker {:id "triangle-start"
-            :view-box "0 0 10 10"
-            :ref-x 10
-            :ref-y 5
-            :marker-width -6
+  [:marker {:id            "triangle-start"
+            :view-box      "0 0 10 10"
+            :ref-x         10
+            :ref-y         5
+            :marker-width  -6
             :marker-height 6
-            :orient "auto"}
+            :orient        "auto"}
    [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
 
 (rum/defc end-marker []
-  [:marker {:id "triangle-end"
-            :view-box "0 0 10 10"
-            :ref-x 10
-            :ref-y 5
-            :marker-width 6
+  [:marker {:id            "triangle-end"
+            :view-box      "0 0 10 10"
+            :ref-x         10
+            :ref-y         5
+            :marker-width  6
             :marker-height 6
-            :orient "auto"}
+            :orient        "auto"}
    [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
 
-(rum/defc svg2 [{:keys [outer margin inner padding width height x y]
-                 :or {inner {:width  (- (:width outer) (:left margin) (:right margin))
-                             :height (- (:height outer) (:top margin) (:bottom margin))}
-                      width (- (:width inner) (:left padding) (:right padding))
-                      height (- (:height inner) (:top padding) (:bottom padding))
-                      x (->Identity [0 width])
-                      y (->Identity [0 height])
-                      }}]
-  [:svg {:width  (:width outer)
-         :height (:height outer)}
-   [:g {:transform (str "translate(" (:left margin) "," (:right margin) ")")}
-    [:defs
-     (start-marker)
-     (end-marker)]
-    [:rect {:class-name (:outer styles)
-            :width      (:width inner)
-            :height     (:height inner)}]
-    [:g {:transform (str "translate(" (:left padding) "," (:right padding) ")")}
-     [:rect {:class-name (:inner styles)
-             :width width
-             :height height}]
-     [:g {:class-name ".xaxis"
-          :transform  (str "translate(0," ((i->o y) -10) ")")}
-      (axisBottom {:scale x :ticks (range 0 (+ width (/ width 9)) (/ width 9))})]
-     [:g {:class-name ".yaxis"
-          :transform (str "translate(-10,0)")}
-      (axisLeft {:scale y :ticks (range 0 (+ height (/ height 8)) (/ height 8))})]]
-    ]
-   ])
+(rum/defc margins [{:keys [outer margin inner padding width height x x-ticks y y-ticks]}]
+  (let [inner (if (nil? inner) {:width  (- (:width outer) (:left margin) (:right margin))
+                                :height (- (:height outer) (:top margin) (:bottom margin))}
+                               inner)
+        width (if (nil? width) (- (:width inner) (:left padding) (:right padding)) width)
+        height (if (nil? height) (- (:height inner) (:top padding) (:bottom padding)) height)
+        x (if (nil? x) (->Identity [0 width]) x)
+        x-ticks (if (nil? x-ticks) (ticks 0 width 10) x-ticks)
+        y (if (nil? y) (->Identity [0 height]) y)
+        y-ticks (if (nil? y-ticks) (ticks 0 height 5) y-ticks)]
+
+    [:svg {:width  (:width outer)
+           :height (:height outer)}
+     [:g {:transform (str "translate(" (:left margin) "," (:right margin) ")")}
+      [:defs {:key 0}
+       (rum/with-key (start-marker) 0)
+       (rum/with-key (end-marker) 1)]
+      [:rect {:key        1
+              :class-name (:outer styles)
+              :width      (:width inner)
+              :height     (:height inner)}]
+      [:g {:key       2
+           :transform (str "translate(" (:left padding) "," (:right padding) ")")}
+       [:rect {:key        1
+               :class-name (:inner styles)
+               :width      width
+               :height     height}]
+       [:g {:key        2
+            :class-name ".xaxis"
+            :transform  (str "translate(0," (+ (first (out y)) 10) ")")}
+        (axisBottom {:scale x :ticks x-ticks})]
+       [:g {:key        3
+            :class-name ".yaxis"
+            :transform  (str "translate(" (- (first (out x)) 10) ",0)")}
+        (axisLeft {:scale y :ticks y-ticks})]]]]))
 
 
 (rum/defc svg [space]
