@@ -1,4 +1,6 @@
-(ns svg.scales)
+(ns svg.scales
+  (:require [svg.format :refer [scientific]]))
+
 
 (defprotocol IScale
   (i->o [_])
@@ -55,8 +57,7 @@
         [(* (Math.floor (/ start step)) step)
          (* (Math.ceil (/ stop step)) step)])
 
-      input))
-  )
+      input)))
 
 (defn nice-identity [in tick-count]
   (->Identity (linear-nice in tick-count) tick-count))

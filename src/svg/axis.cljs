@@ -1,4 +1,4 @@
-(ns svg.axes
+(ns svg.axis
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [cljs-css-modules.macro :refer-macros [defstyle]]

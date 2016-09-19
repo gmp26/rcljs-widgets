@@ -35,6 +35,7 @@
                                        :output-to            "resources/public/js/compiled/rcljswidgets_devcards.js"
                                        :output-dir           "resources/public/js/compiled/devcards_out"
                                        :source-map-timestamp true
+                                       :optimizations        :none
                                        }}
                        {:id           "rlib"
                         :source-paths ["rlib" "src"]
@@ -58,7 +59,10 @@
                                        :asset-path           "js/compiled/out"
                                        :output-to            "resources/public/js/compiled/rcljswidgets.js"
                                        :output-dir           "resources/public/js/compiled/out"
-                                       :source-map-timestamp true}}
+                                       :source-map-timestamp true
+                                       ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
+                                       ;; https://github.com/binaryage/cljs-devtools
+                                       :preloads             [devtools.preload]}}
                        {:id           "prod"
                         :source-paths ["src"]
                         :compiler     {:main          "rcljswidgets.core"
