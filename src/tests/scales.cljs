@@ -3,6 +3,7 @@
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
     [svg.scales :refer [->Identity ->Linear i->o o->i nice-linear ticks]]
+    [svg.format :refer [formatDecimal]]
     ))
 
 (deftest
@@ -31,5 +32,18 @@
            (range 13 1 -1)) "nice reverse scales have sensible ticks")
 
     (is (= (ticks (nice-linear [-10 10] [0 100] 10)) [-10 -8 -6 -4 -2 0 2 4 6 8 10]))
+    ))
+
+(deftest
+  format-Decimal
+  (testing
+    (is (= (formatDecimal 1.2345 1) ["1" "+0"]))
+    (is (= (formatDecimal 1.2345 2) ["12" "+0"]))
+    (is (= (formatDecimal 12.345 4) ["1235" "+1"]))
+    (is (= (formatDecimal 0.12345 4) ["1235" "-1"]))
+    (is (= (formatDecimal 0.012345 5) ["12345" "-2"]))
+    (is (= (formatDecimal 0.012345) ["12345" "-2"]))
+    (is (= (formatDecimal 0.12345) ["12345" "-1"]))
+    (is (= (formatDecimal 1.2345) ["12345" "+0"]))
     ))
 

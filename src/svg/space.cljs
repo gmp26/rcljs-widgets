@@ -86,7 +86,7 @@
        [:g {:key        3
             :class-name ".yaxis"
             :transform  (str "translate(" (- (first (out x)) 10) ",0)")}
-        (axisLeft {:scale y :ticks y-ticks :formatter #(cl-format nil "~4$" %)})]]]]))
+        (axisLeft {:scale y :ticks y-ticks :formatter #(cl-format nil "~1$" %)})]]]]))
 
 
 (rum/defc svg [space]
