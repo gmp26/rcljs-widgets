@@ -1,8 +1,9 @@
 (ns svg.axis
   (:require [rum.core :as rum]
             [clojure.string :as s]
+            [cljs.pprint :refer [cl-format]]
             [cljs-css-modules.macro :refer-macros [defstyle]]
-            [svg.scales :refer [->Identity ->Linear in out i->o o->i tick-format]]))
+            [svg.scales :refer [->Identity ->Linear in out i->o o->i tick-format-specifier]]))
 
 
 (defstyle styles
@@ -15,12 +16,12 @@
            [".tick-label" {:fill "green"}]])
 
 
-(rum/defc axisBottom [{:keys [scale ticks formatter]
+(rum/defc axisBottom [{:keys [scale ticks format-specifier]
                        :or   {scale (->Identity [0 1] 10)
                               ticks (range 0 1 0.1)}}]
   (let [[x1 x2] (in scale)
         x (i->o scale)
-        formatter (if (nil? formatter) (tick-format scale) formatter)]
+        specifier (if (nil? format-specifier) (tick-format-specifier scale) format-specifier)]
     [:g
      [:line {:key        "X"
              :x1         (x x1)
@@ -43,14 +44,14 @@
                 :dx          0
                 :dy          "2.5ex"
                 :text-anchor "middle"
-                } (formatter tick)]])]))
+                } (cl-format nil specifier tick)]])]))
 
-(rum/defc axisLeft [{:keys [scale ticks formatter]
+(rum/defc axisLeft [{:keys [scale ticks format-specifier]
                      :or   {scale (->Identity [0 1] 10)
                             ticks (range 0 1 0.1)}}]
   (let [[y1 y2] (in scale)
         y (i->o scale)
-        formatter (if (nil? formatter) (tick-format scale) formatter)]
+        specifier (if (nil? format-specifier) (tick-format-specifier scale) format-specifier)]
     [:g
      [:line {:key        "Y"
              :x1         0
@@ -68,7 +69,7 @@
                 :dx          "-1ex"
                 :dy          "0.5ex"
                 :text-anchor "end"
-                } (formatter tick)]
+                } (cl-format nil specifier tick)]
         [:line {:key        1
                 :x1         0
                 :y1         (y tick)

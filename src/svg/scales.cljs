@@ -1,6 +1,6 @@
 (ns svg.scales
   (:require [svg.format :refer [scientific formatDecimal]]
-            [cljs.pprint :refer [cl-format]]))
+            ))
 
 
 (defprotocol IScale
@@ -9,7 +9,7 @@
   (in [_])
   (out [_])
   (ticks [_])
-  (tick-format [_])
+  (tick-format-specifier [_])
   )
 
 (def e10 (Math.sqrt 50))
@@ -34,19 +34,25 @@
       (+ (* (Math.floor (/ stop step)) step) (/ step 2))
       step)))
 
-(defn -tick-format [scale]
-  "Provide a default formatter for numeric scales"
+(defn numeric-format-specifier [scale]
+  "Provide a default format specifier for numeric scales"
   (let [abs-in (map Math.abs (:in scale))
         abs-step (Math.abs (apply tick-step (conj (:in scale) (:tick-count scale))))]
-    #(cl-format nil (cond
-                      (< abs-step 0.0001)
-                      "~(~e~)"
-                      (> (apply max abs-in) 9999)
-                      "~(~e~)"
-                      (>= abs-step 1)
-                      "~d"
-                      :else
-                      "~$") %)))
+    (cond
+      (< abs-step 0.0001)
+      "~(~e~)"
+      (> (apply max abs-in) 9999)
+      "~(~e~)"
+      (>= abs-step 1)
+      "~d"
+      (>= abs-step 0.1)
+      "~1$"
+      (>= abs-step 0.01)
+      "~$"
+      (>= abs-step 0.001)
+      "~3$"
+      :else
+      "~4$")))
 
 (defn- scale-ticks [a-scale tick-count]
   (apply preferred-ticks (conj (:in a-scale) tick-count)))
@@ -58,7 +64,7 @@
   (in [this] (:in this))
   (out [this] (:in this))
   (ticks [this] (scale-ticks this tick-count))
-  (tick-format [this] (-tick-format this)))
+  (tick-format-specifieer [this] (numeric-format-specifier this)))
 
 (defn- linear [[x1 x2] [y1 y2]] (fn [x] (+ y1 (* (/ (- x x1) (- x2 x1)) (- y2 y1)))))
 
@@ -86,7 +92,7 @@
   (in [this] (:in this))
   (out [this] (:out this))
   (ticks [this] (scale-ticks this tick-count))
-  (tick-format [this] (-tick-format this)))
+  (tick-format-specifier [this] (numeric-format-specifier this)))
 
 (defn nice-linear [in out tick-count]
   (->Linear (linear-nice in tick-count) out tick-count))
