@@ -22,5 +22,5 @@
         [(if (> (count coefficient) 1)
            (str (get coefficient 0) (subs coefficient 2))
            coefficient
-           ) (subs x (inc i))]
+           ) (js/parseInt (subs x (inc i)))]
         ))))
