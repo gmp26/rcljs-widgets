@@ -1,9 +1,10 @@
-(ns cards.margins
+(ns cards.margin-convention
   (:require [pubsub.feeds :refer [create-feed ->Topic]]
             [cljs.test :refer-macros [is testing]]
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [devcards.core :refer-macros [defcard-doc defcard deftest]]
-            [svg.space :refer [margins space]]))
+            [svg.space :refer [space]]
+            [svg.margin-convention :refer [margins]]))
 
 (enable-console-print!)
 
@@ -26,4 +27,8 @@
 (defcard
   "nicely calculated ticks from data in [23 3200] [10.2 10.5]"
   (margins (space outer margin padding [23 3200] 10 [10.2 10.5] 5)))
+
+(defcard
+  "large value and low value scales"
+  (margins (space outer margin padding [20000 30000] 5 [0.001 0.002] 5)))
 

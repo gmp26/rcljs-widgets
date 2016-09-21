@@ -1,7 +1,4 @@
-(ns svg.scales
-  (:require [svg.format :refer [scientific formatDecimal]]
-            ))
-
+(ns svg.scales)
 
 (defprotocol IScale
   (i->o [_])
@@ -39,10 +36,10 @@
   (let [abs-in (map Math.abs (:in scale))
         abs-step (Math.abs (apply tick-step (conj (:in scale) (:tick-count scale))))]
     (cond
-      (< abs-step 0.0001)
-      "~(~e~)"
-      (> (apply max abs-in) 9999)
-      "~(~e~)"
+      (< abs-step 0.00001)
+      "~(~3,1e~)"
+      (> (apply max abs-in) 99999)
+      "~(~,1e~)"
       (>= abs-step 1)
       "~d"
       (>= abs-step 0.1)
@@ -51,8 +48,10 @@
       "~$"
       (>= abs-step 0.001)
       "~3$"
+      (>= abs-step 0.0001)
+      "~0,4f"
       :else
-      "~4$")))
+      "~0,5f")))
 
 (defn- scale-ticks [a-scale tick-count]
   (apply preferred-ticks (conj (:in a-scale) tick-count)))
@@ -64,7 +63,7 @@
   (in [this] (:in this))
   (out [this] (:in this))
   (ticks [this] (scale-ticks this tick-count))
-  (tick-format-specifieer [this] (numeric-format-specifier this)))
+  (tick-format-specifier [this] (numeric-format-specifier this)))
 
 (defn- linear [[x1 x2] [y1 y2]] (fn [x] (+ y1 (* (/ (- x x1) (- x2 x1)) (- y2 y1)))))
 

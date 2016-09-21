@@ -8,8 +8,8 @@
     [cards.js-wrapped-tangletext]
     [tests.check-tests]
     [cards.app-state]
-    ;[cards.funnel]
-    [cards.margins]
+    [cards.funnel]
+    [cards.margin-convention]
     [tests.scales]
     [tests.dbinom]
     ))

@@ -3,28 +3,17 @@
             [cljs.test :refer-macros [is testing]]
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [devcards.core :refer-macros [defcard-doc defcard deftest]]
-            [rcljswidgets.funnel-plots :refer [test-plot svg-container axis]]
+            [svg.space :refer [space]]
+            [rcljswidgets.funnel-plots :refer [funnel]]
             [alg.binom :as alg]))
 
 (enable-console-print!)
 
-(.log js/console (alg/sfe 3))
 
-(def data nil)
-
-(defcard
-  "A test plot"
-  (svg-container 600 200 #(test-plot data))
-  )
-
+(def margin {:top 20 :right 20 :bottom 20 :left 20})
+(def padding {:top 60 :right 30 :bottom 40 :left 70})
+(def outer {:width 700 :height 600})
 
 (defcard
-  "axis"
-  (svg-container 550 400 #(axis {:position :bottom
-                                 :lb 0
-                                 :ub 5000
-                                 :ticks (range 0 6000 1000)
-                                 :title "Number of operations per hospital"})
-                 [-200 0 5400 400]))
-
-
+  "a funnel"
+  (funnel (space outer margin padding [0 200] 10 [1 100] 5)))

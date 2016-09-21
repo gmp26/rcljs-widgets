@@ -1,18 +1,20 @@
-(ns rcljswidgets.funnel-plots
+(ns svg.margin-convention
   (:require [rum.core :as rum]
             [clojure.string :as s]
+            [cljs.pprint :refer [cl-format]]
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [svg.axis :refer [axisBottom axisTop axisLeft axisRight]]
             [svg.scales :refer [->Identity nice-linear i->o o->i in out ticks]]
+            [svg.mixins :refer [patch-svg-attrs]]
             ))
-
-(def data nil)
 
 (defstyle styles
           [[".outer" {:fill   "none"
                       :stroke "#000"}]
-           [".inner" {:fill             "#fff"
-                      :stroke           "none"}]
+           [".inner" {:fill             "#ccc"
+                      :stroke           "#000"
+                      :stroke-width     0.5
+                      :stroke-dasharray "3, 4"}]
            [".annotation" {
                            :font-size "10pt"
                            }]
@@ -22,7 +24,36 @@
                       }]])
 
 
-(rum/defc funnel [{:keys [outer margin inner padding width height x y]}]
+
+(def patch-marker {:did-mount (patch-svg-attrs {"refX" 10
+                                                "refY" 5
+                                                "markerWidth" 6
+                                                "markerHeight" 6
+                                                "orient" "auto"})})
+
+(rum/defc start-marker < patch-marker []
+  [:marker {:id            "triangle-start"
+            :view-box      "0 0 10 10"
+            :ref-X         10                               ; react discards this
+            :ref-Y         5                                ; react discards this
+            :marker-width  6                                ; react discards this
+            :marker-height 6                                ; react discards this
+            :orient        "auto"                           ; react discards this
+            }
+   [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
+
+(rum/defc end-marker < patch-marker []
+  [:marker {:id            "triangle-end"
+            :view-box      "0 0 10 10"
+            :ref-X         10                               ; react discards this
+            :ref-Y         5                                ; react discards this
+            :marker-width  6                                ; react discards this
+            :marker-height 6                                ; react discards this
+            :orient        "auto"                           ; react discards this
+            }
+   [:path {:d "M 0 0 L 10 5 L 0 10 z"}]])
+
+(rum/defc margins [{:keys [outer margin inner padding width height x y]}]
   (let [inner (if (nil? inner) {:width  (- (:width outer) (:left margin) (:right margin))
                                 :height (- (:height outer) (:top margin) (:bottom margin))}
                                inner)
@@ -39,6 +70,10 @@
 
      [:g {:key 0
           :transform "translate(20, 20)"}
+
+      [:defs {:key 0}
+       (rum/with-key (start-marker) 0)
+       (rum/with-key (end-marker) 1)]
 
       [:rect {:key        1
               :class-name (:outer styles)
@@ -60,12 +95,17 @@
             ;:class-name ".xaxis"
             :transform (str "translate(0," (+ (first (out y)) 10) ")")}
         (axisBottom {:scale x :ticks x-ticks})]
+       [:g {:key       "top"
+            :transform (str "translate(0," (- (second (out y)) 10) ")")}
+        (axisTop {:scale x :ticks x-ticks})]
        [:g {:key       "left"
             :transform (str "translate(" (- (first (out x)) 10) ",0)")}
         (axisLeft {:scale y :ticks y-ticks})]
+       [:g {:key       "right"
+            :transform (str "translate(" (+ (second (out x)) 10) ",0)")}
+        (axisRight {:scale y :ticks y-ticks})]
 
-
-       #_[:text {:key "note"
+       [:text {:key "note"
                :class-name (:annotation styles)
                :x          "-30px"
                :y          "-40px"}
@@ -73,7 +113,7 @@
        ]
 
       ;; add in arrows
-      #_[:g {:key 3}
+      [:g {:key 3}
        [:line {:key 0
                :class-name (:arrow styles)
                :x2         (:left padding)
@@ -107,3 +147,4 @@
                  :class-name (:origin styles)
                  :r          4.5}]
        ]]]))
+
