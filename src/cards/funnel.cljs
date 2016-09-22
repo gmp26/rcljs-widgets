@@ -4,7 +4,8 @@
             [cljs-css-modules.macro :refer-macros [defstyle]]
             [devcards.core :refer-macros [defcard-doc defcard deftest]]
             [svg.space :refer [space]]
-            [rcljswidgets.funnel-plots :refer [funnel]]
+            [rcljswidgets.funnel-plots :refer [funnel data-space]]
+            [tests.funnel-data :refer [CABG]]
             [alg.binom :as alg]))
 
 (enable-console-print!)
@@ -16,4 +17,4 @@
 
 (defcard
   "a funnel"
-  (funnel (space outer margin padding [0 200] 10 [1 100] 5)))
+  (funnel (data-space outer margin padding CABG)))

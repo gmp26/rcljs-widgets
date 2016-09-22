@@ -3,7 +3,6 @@
             [svg.scales :refer [nice-linear]]
             ))
 
-
 (defn space [outer margin padding x-domain x-ticks y-domain y-ticks]
   (let [inner {:width  (- (:width outer) (:left margin) (:right margin))
                :height (- (:height outer) (:top margin) (:bottom margin))}

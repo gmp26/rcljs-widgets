@@ -9,6 +9,7 @@
     [tests.check-tests]
     [cards.app-state]
     [cards.funnel]
+    [cards.markers]
     [cards.margin-convention]
     [tests.scales]
     [tests.dbinom]
