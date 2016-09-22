@@ -6,17 +6,25 @@
           [[".open" {:fill         "none"
                      :stroke       "#000"
                      :stroke-width 1}]
-           [".filled" {:fill   "#000"
-                       :stroke "none"}]])
+           [".filled" {:fill         "#000"
+                       :r            3
+                       :stroke       "rgba(0,128,128,0.2)"
+                       :stroke-width 5}]
+           [".hovered" {:fill         "#000"
+                        :stroke       "rgba(0,128,128,0.3)"
+                        ;:r 10
+                        :stroke-width 40}]])
 
 (defn op [c-name]
   (if c-name c-name :filled))
 
-(rum/defc dot [r cx cy & [c-name]]
-  [:circle {:class-name ((op c-name) styles)
-            :r          r
-            :cx         cx
-            :cy         cy}])
+(rum/defcs dot [state r cx cy & [c-name]]
+  [:circle {:class-name    ((op c-name) styles)
+            :on-mouse-over #(.setAttribute (rum/dom-node state) "class" (:hovered styles))
+            :on-mouse-out  #(.setAttribute (rum/dom-node state) "class" (:filled styles))
+            :r             r
+            :cx            cx
+            :cy            cy}])
 
 (defn ring [r cx cy]
   (dot r cx cy :open))
@@ -64,5 +72,4 @@
 (rum/defc cross [r cx cy]
   [:g {:transform (str "translate(" cx "," cy ")")}
    [:g {:transform "rotate(45)"}
-    (plus r 0 0)]]
-  )
+    (plus r 0 0)]])
