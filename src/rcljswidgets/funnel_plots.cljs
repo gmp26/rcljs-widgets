@@ -15,20 +15,24 @@
                       :stroke "#000"}]
            [".inner" {:fill   "#fff"
                       :stroke "none"}]
-           [".annotation" {
-                           :font-size "10pt"
-                           }]
-           [".arrow" {
-                      :stroke       "#000"
-                      :stroke-width "1.5px"
-                      }]])
-
+           [".annotation" {:font-size "10pt"}]
+           [".arrow" {:stroke       "#000"
+                      :stroke-width "1.5px"}]])
 
 (def error-messages {:no-data "There is no data for at least one hospital"})
 
-
+;;
+;; R-code (without error handling)
+;;
+; N <- x$Cases
+; R <- N - x$Deaths
+; P <- N - x$EMR * N / 100
+; xrange <- c( 0, max(N) )
+; yrange <- c( min( R / N ) - 0.01, 1 )
+; names <- as.character(x$Hospital)
 (defn make-scales [data]
-  "Given a vector of hospital records, derive data to plot and scales"
+  "Given a vector of hospital records, calculate a few stats
+  and the data ranges. Return augmented data"
   (let [n (map :Cases data)
         r (map - n (map :Deaths data))
         p (map - n (map #(/ % 100) (map * (map :EMR data) n)))]
@@ -43,6 +47,17 @@
        :y-range   [(apply min (map #(- % 0.01) (map / r n))) 1]}
       {:error "no-data"})))
 
+(defn augment-data [data]
+  "augment data with derived stats"
+  (for [hospital (filter #(pos? (:Cases %)) data)]
+    (let [n (:Cases hospital)
+          r (- n (:Deaths hospital))
+          p (- n (/ (* n (:EMR hospital)) 100))]
+      (merge hospital
+             {:survivors r
+              :obs-prop (/ r n)
+              :pred-prop (/ p n)
+              }))))
 ;; In the original R we have:
 ;;
 ;; numer = obs.prop * denom = r/n * n = r
@@ -74,6 +89,8 @@
 
 
 (defn data-space [outer margin padding data]
+  "Calculate inner plot space and appropriate scales from the outer plot dimensions,
+  margins, padding, and data extent."
   (let [inner {:width  (- (:width outer) (:left margin) (:right margin))
                :height (- (:height outer) (:top margin) (:bottom margin))}
         width (- (:width inner) (:left padding) (:right padding))
@@ -139,8 +156,5 @@
          [:g {:key "data"}
           (mapv #(dot 2.5 %1 %2) (map (i->o x) n) (map (i->o y) obs-prop))
           ]
-
          ]
-
-
         ]])))
