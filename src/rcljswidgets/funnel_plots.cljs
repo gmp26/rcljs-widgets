@@ -8,7 +8,7 @@
             [tests.funnel-data :refer [CABG]]
             ))
 
-(def data CABG)
+;(def data CABG)
 
 (defstyle styles
           [[".outer" {:fill   "none"
@@ -19,7 +19,7 @@
            [".arrow" {:stroke       "#000"
                       :stroke-width "1.5px"}]])
 
-(def error-messages {:no-data "There is no data for at least one hospital"})
+
 
 ;;
 ;; R-code (without error handling)
@@ -30,34 +30,55 @@
 ; xrange <- c( 0, max(N) )
 ; yrange <- c( min( R / N ) - 0.01, 1 )
 ; names <- as.character(x$Hospital)
+
+(defn non-negative-int? [n]
+  "We need 2 out of :Deaths :Survivors :Cases to be non-negative integers"
+  (and (integer? n) (or (pos? n) (zero? n))))
+
+(defn valid-record [hospital]
+  "Take a hospital record and checks that :Deaths, :Survivors and :Cases are consistent,
+   returning the record with those 3 fields all filled in.
+   If there is insufficient or inconsistent data, return nil"
+  (let [{:keys [Deaths Survivors Cases]} hospital
+        check (count (filter non-negative-int? [Deaths Survivors Cases]))]
+    (cond
+      (= check 3) (when (= (+ Deaths Survivors) Cases) hospital)
+      (= check 2) (cond
+                    (not (non-negative-int? Deaths))
+                    (if (< Survivors Cases) (assoc hospital :Deaths (- Cases Survivors)) nil)
+
+                    (not (non-negative-int? Survivors))
+                    (if (< Deaths Cases) (assoc hospital :Survivors (- Cases Deaths)) nil)
+                    :else (assoc hospital :Cases (+ Deaths Survivors)))
+      :else nil)
+    ))
+
+
 (defn make-scales [data]
   "Given a vector of hospital records, calculate a few stats
-  and the data ranges. Return augmented data"
+  and the data ranges. Return augmented data. Assumes data is sane"
   (let [n (map :Cases data)
         r (map - n (map :Deaths data))
         p (map - n (map #(/ % 100) (map * (map :EMR data) n)))]
-    (if (every? pos? n)
-      {:error     nil
-       :n         n
-       :r         r
-       :p         p
-       :obs-prop  (map / r n)
-       :pred-prop (map / p n)
-       :x-range   [0 (apply max n)]
-       :y-range   [(apply min (map #(- % 0.01) (map / r n))) 1]}
-      {:error "no-data"})))
 
-(defn augment-data [data]
-  "augment data with derived stats"
-  (for [hospital (filter #(pos? (:Cases %)) data)]
-    (let [n (:Cases hospital)
-          r (- n (:Deaths hospital))
-          p (- n (/ (* n (:EMR hospital)) 100))]
+    {:error     nil
+     :n         (into [] n)
+     :pred-prop (mapv / p n)
+     :x-range   [0 (apply max n)]
+     :y-range   [(apply min (map / r n)) 1]}
+    ))
+
+(defn derived-data [data]
+  "augment data with derived fields"
+  ; todo: allow alternative but equivalent sets of supplied fields
+  (for [hospital (keep valid-record data)]
+
+    (let [{:keys [Deaths Survivors Cases EMR]} hospital]
       (merge hospital
-             {:survivors r
-              :obs-prop (/ r n)
-              :pred-prop (/ p n)
-              }))))
+             {:obs-prop  (/ Survivors Cases)
+              :pred-prop (- 1 (/ EMR 100))}))))
+
+
 ;; In the original R we have:
 ;;
 ;; numer = obs.prop * denom = r/n * n = r
@@ -95,34 +116,29 @@
                :height (- (:height outer) (:top margin) (:bottom margin))}
         width (- (:width inner) (:left padding) (:right padding))
         height (- (:height inner) (:top padding) (:bottom padding))
-        {:keys [error x-range y-range obs-prop n]} (make-scales data)]
-    {:outer    outer
-     :inner    inner
-     :margin   margin
-     :padding  padding
-     :width    width
-     :height   height
-     :x        (if error nil (nice-linear x-range [0 width] 5))
-     :y        (if error nil (nice-linear y-range [height 0] 5))
-     :obs-prop obs-prop
-     :n        n
-     :data     data
-     :error    error
+        {:keys [x-range y-range]} (make-scales data)]
+    {:outer   outer
+     :inner   inner
+     :margin  margin
+     :padding padding
+     :width   width
+     :height  height
+     :x       (nice-linear x-range [0 width] 5)
+     :y       (nice-linear y-range [height 0] 5)
+     :data    data
      }))
 
 
-(rum/defc funnel [{:keys [error outer margin inner padding width height x y obs-prop n]}]
+(rum/defc funnel [{:keys [outer margin inner padding width height x y data]}]
   (let [inner (if (nil? inner) {:width  (- (:width outer) (:left margin) (:right margin))
                                 :height (- (:height outer) (:top margin) (:bottom margin))}
                                inner)
         width (if (nil? width) (- (:width inner) (:left padding) (:right padding)) width)
         height (if (nil? height) (- (:height inner) (:top padding) (:bottom padding)) height)
-        x-ticks (ticks x)
-        y-ticks (ticks y)
         ]
 
-    (if error
-      [:h2 (error error-messages)]
+    (let [x-ticks (ticks x)
+          y-ticks (ticks y)]
       [:svg {:width  (:width outer)
              :height (:height outer)}
 
@@ -135,7 +151,7 @@
                 :height     (:height inner)}]
 
         ;;
-        ;; define the coordinate system
+        ;; the plot area
         ;;
         [:g {:key       2
              :transform (str "translate(" (:left padding) "," (:right padding) ")")}
@@ -144,7 +160,7 @@
                  :width      width
                  :height     height}]
 
-         ;; add axes on all edges
+         ;; add axes and offset them from plot-are edges
          [:g {:key       "bottom"
               :transform (str "translate(0," (+ (first (out y)) 10) ")")}
           (axisBottom {:scale x :ticks x-ticks})]
@@ -152,9 +168,22 @@
               :transform (str "translate(" (- (first (out x)) 10) ",0)")}
           (axisLeft {:scale y :ticks y-ticks})]
 
-         ;; add data
+         ;; add plotted data
+         #_[:g {:key "data"}
+            (for [i (range (count data))
+                  :let [hospital (nth data i)
+                        op (:obs-prop hospital)
+                        cases (:Cases hospital)]]
+              (rum/with-key (dot 2.5 ((i->o x) cases) ((i->o y) op)) (str "dot" i)))]
+
+
          [:g {:key "data"}
-          (mapv #(dot 2.5 %1 %2) (map (i->o x) n) (map (i->o y) obs-prop))
-          ]
+          (map-indexed
+            #(rum/with-key (apply (partial dot 2.5) %2) (str "dot" %1))
+
+            (map (fn [hospital]
+                   [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])
+                 data))]
+
          ]
         ]])))

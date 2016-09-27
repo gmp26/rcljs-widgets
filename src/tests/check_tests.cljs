@@ -4,7 +4,6 @@
     [devcards.core :refer-macros [deftest]]
     ))
 
-
 (deftest
   just-checking
   (testing
