@@ -176,14 +176,23 @@
                         cases (:Cases hospital)]]
               (rum/with-key (dot 2.5 ((i->o x) cases) ((i->o y) op)) (str "dot" i)))]
 
-
          [:g {:key "data"}
-          (map-indexed
-            #(rum/with-key (apply (partial dot 2.5) %2) (str "dot" %1))
+          (map
+            #(rum/with-key (apply (partial dot 2.5) %) (gensym "dot"))
 
             (map (fn [hospital]
                    [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])
-                 data))]
+                 data))
+          ]
+
+         #_[:g {:key "data"}
+            (map-indexed
+              #(rum/with-key (apply (partial dot 2.5) %2) (str "dot" %1))
+
+              (map (fn [hospital]
+                     [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])
+                   data))
+          ]
 
          ]
         ]])))

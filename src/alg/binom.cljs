@@ -77,6 +77,19 @@
              (Math.sqrt (/ n (* PI2 x (- n x))))))))))
 
 ;;;
+;; Evaluate distribution function
+;;;
+(defn pbinom [x n p]
+  "x is a vector of n-quantile indexes or a single quantile index.
+  We first calculate all quantiles up to (max x), and return only
+  those indicated by x"
+  (let [x (vec x)
+        all-q (into [] (take (inc (apply max x)) (reductions + (map #(dbinom % n p) (range (inc n))))))
+        ]
+    (map #(all-q %) x)
+    ))
+
+;;;
 ;; Evaluate dpois
 ;;;
 (defn dpois [x lb]
