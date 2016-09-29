@@ -58,9 +58,9 @@
       (+ (* x (Math.log (/ x np))) np (- x)))))
 
 ;;;
-;; Evaluate dbinom
+;; Evaluate dbinom on 1 quantile
 ;;;
-(defn dbinom [x n p]
+(defn dbinom1 [x n p]
   (if (zero? p)
     (if (zero? x) 1 0)
     (if (= 1 p)
@@ -77,13 +77,28 @@
              (Math.sqrt (/ n (* PI2 x (- n x))))))))))
 
 ;;;
+;; Evaluate dbinom on 1 or more quantiles
+;;;
+(defn dbinom [x n p]
+  "x is a vector of n-quantile indexes"
+  (let [x (if (seq? x) x [x])
+        result (map (fn [q] (dbinom1 q n p)) x)]
+    (prn x)
+    (prn "result=" result)
+    (if (= (rest result) ())
+      (first result)
+      result)
+    ))
+
+;;;
 ;; Evaluate distribution function
 ;;;
+
 (defn pbinom [x n p]
   "x is a vector of n-quantile indexes or a single quantile index.
   We first calculate all quantiles up to (max x), and return only
   those indicated by x"
-  (let [x (vec x)
+  (let [x (vector? x) x (vector x)
         all-q (into [] (take (inc (apply max x)) (reductions + (map #(dbinom % n p) (range (inc n))))))
         ]
     (map #(all-q %) x)
