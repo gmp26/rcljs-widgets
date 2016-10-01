@@ -11,6 +11,7 @@
     [cards.funnel]
     [cards.markers]
     [cards.margin-convention]
+    [tests.utils]
     [tests.scales]
     [tests.dbinom]
     ))

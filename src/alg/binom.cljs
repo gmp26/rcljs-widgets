@@ -1,4 +1,5 @@
-(ns alg.binom)
+(ns alg.binom
+  (:require [rcljswidgets.utils :refer [fabs]]))
 
 ;;;
 ;; Loaders algorithm for the binomial distribution
@@ -35,9 +36,6 @@
         (> n 80) (/ (- S0 (/ (- S1 (/ S2 nn)) nn)) n)
         (> n 35) (/ (- S0 (/ (- S1 (/ (- S2 (/ S3 nn)) nn)) nn)) n)
         :else (/ (- S0 (/ (- S1 (/ (- S2 (/ (- S3 (/ S4 nn)) nn)) nn)) nn)) n)))))
-
-(defn fabs [r]
-  (if (pos? r) r (- r)))
 
 ;;;
 ;; Evaluate the deviance term
@@ -81,7 +79,7 @@
 ;;;
 (defn dbinom [x n p]
   "x is a vector of n-quantile indexes"
-  (let [x (if (seq? x) x [x])
+  (let [x (if (or (vector? x) (seq? x)) x [x])
         result (map (fn [q] (dbinom1 q n p)) x)]
     (prn x)
     (prn "result=" result)
