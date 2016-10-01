@@ -2,7 +2,7 @@
   (:require
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
-    [alg.binom :refer [dbinom]]
+    [alg.binom :refer [dbinom pbinom]]
     [rcljswidgets.utils :refer [fabs close? all-close?]]
     ))
 
@@ -27,3 +27,10 @@
   with-vector-quantiles
   (testing "pairs"
     (is (all-close? (dbinom [0 20 1 6] 20 0.8) [1.048576e-14 0.01152922 8.388608e-13 1.664729e-06]))))
+
+(deftest
+  check-pbinom
+  (testing "pbinom agrees with R pbinom"
+    (is (close? (pbinom 2 10 0.3) 0.3827828))
+    (is (close? (pbinom 2 10 0.3 false) 0.6172172))
+    (is (all-close? (pbinom [2 5 8], 10, 0.3) [0.3827828 0.9526510 0.9998563]))))

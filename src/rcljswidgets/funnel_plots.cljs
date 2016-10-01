@@ -31,14 +31,16 @@
 ; yrange <- c( min( R / N ) - 0.01, 1 )
 ; names <- as.character(x$Hospital)
 
-(defn non-negative-int? [n]
+(defn non-negative-int?
   "We need 2 out of :Deaths :Survivors :Cases to be non-negative integers"
+  [n]
   (and (integer? n) (or (pos? n) (zero? n))))
 
-(defn valid-record [hospital]
+(defn valid-record
   "Take a hospital record and checks that :Deaths, :Survivors and :Cases are consistent,
    returning the record with those 3 fields all filled in.
    If there is insufficient or inconsistent data, return nil"
+  [hospital]
   (let [{:keys [Deaths Survivors Cases]} hospital
         check (count (filter non-negative-int? [Deaths Survivors Cases]))]
     (cond
@@ -54,9 +56,10 @@
     ))
 
 
-(defn make-scales [data]
+(defn make-scales
   "Given a vector of hospital records, calculate a few stats
   and the data ranges. Return augmented data. Assumes data is sane"
+  [data]
   (let [n (map :Cases data)
         r (map - n (map :Deaths data))
         p (map - n (map #(/ % 100) (map * (map :EMR data) n)))]
@@ -68,9 +71,9 @@
      :y-range   [(apply min (map / r n)) 1]}
     ))
 
-(defn derived-data [data]
+(defn derived-data
   "augment data with derived fields"
-  ; todo: allow alternative but equivalent sets of supplied fields
+  [data]
   (for [hospital (keep valid-record data)]
 
     (let [{:keys [Deaths Survivors Cases EMR]} hospital]
@@ -109,9 +112,10 @@
 ;}
 
 
-(defn data-space [outer margin padding data]
+(defn data-space
   "Calculate inner plot space and appropriate scales from the outer plot dimensions,
   margins, padding, and data extent."
+  [outer margin padding data]
   (let [inner {:width  (- (:width outer) (:left margin) (:right margin))
                :height (- (:height outer) (:top margin) (:bottom margin))}
         width (- (:width inner) (:left padding) (:right padding))

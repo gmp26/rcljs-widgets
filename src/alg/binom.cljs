@@ -1,5 +1,8 @@
 (ns alg.binom
-  (:require [rcljswidgets.utils :refer [fabs]]))
+  (:require [rcljswidgets.utils :refer [fabs]]
+            [rcljswidgets.utils :refer [r-wrap r-unwrap]]))
+
+
 
 ;;;
 ;; Loaders algorithm for the binomial distribution
@@ -75,32 +78,47 @@
              (Math.sqrt (/ n (* PI2 x (- n x))))))))))
 
 ;;;
-;; Evaluate dbinom on 1 or more quantiles
+;; Evaluate dbinom on 1 or more quantiles.
+;;
+;; Note that dbinom, pbinom, and qbinom take scalar parameters unless vectors are explicitly allowed.
+;;
+;; This is not (yet) exactly as the R equivalent function works
+;;
 ;;;
 (defn dbinom [x n p]
-  "x is a vector of n-quantile indexes"
-  (let [x (if (or (vector? x) (seq? x)) x [x])
+  "x is a vector of n-quantile indexes
+  Return their densities"
+  (let [x (r-wrap x)
         result (map (fn [q] (dbinom1 q n p)) x)]
-    (prn x)
-    (prn "result=" result)
-    (if (= (rest result) ())
-      (first result)
-      result)
+    (r-unwrap result)
     ))
 
 ;;;
 ;; Evaluate distribution function
 ;;;
-
-(defn pbinom [x n p]
+(defn pbinom [x n p & [tails]]
   "x is a vector of n-quantile indexes or a single quantile index.
   We first calculate all quantiles up to (max x), and return only
   those indicated by x"
-  (let [x (vector? x) x (vector x)
-        all-q (into [] (take (inc (apply max x)) (reductions + (map #(dbinom % n p) (range (inc n))))))
-        ]
-    (map #(all-q %) x)
+  (let [tails (if (nil? tails) true tails)
+        x (r-wrap x)
+        all-q (into [] (take (inc (apply max x)) (reductions + (map #(dbinom % n p) (range (inc n))))))]
+    ;(prn tails)
+    ;(r-unwrap (map #(all-q %) x))
+    (r-unwrap (map (comp (if tails identity #(- 1 %)) all-q) x))))
+
+
+;;;
+;; Evaluate qbinom.
+;;;
+(defn qbinom [p size prob & [tails]]
+  "The quantile is defined as the smallest value x such that F(x) ≥ p,
+  where F is the distribution function.
+  In this case we allow prob to be a vector"
+  (let [prob (r-wrap prob)]
+
     ))
+
 
 ;;;
 ;; Evaluate dpois
@@ -125,4 +143,4 @@
           (if (< j1 x)
             (recur (* f p) j0 (inc j1) j2)
             (recur (* f (- 1 p)) j0 j1 (inc j2))))
-        f ))))
+        f))))

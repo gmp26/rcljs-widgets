@@ -6,14 +6,15 @@
     [cards.tangles]
     [cards.js-tangletext]
     [cards.js-wrapped-tangletext]
-    [tests.check-tests]
     [cards.app-state]
     [cards.funnel]
     [cards.markers]
     [cards.margin-convention]
+    ;[tests.check-tests]
     [tests.utils]
     [tests.scales]
     [tests.dbinom]
+    [tests.r-calls]
     ))
 
 (defn ^:export main []
