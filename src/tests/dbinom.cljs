@@ -2,7 +2,7 @@
   (:require
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
-    [alg.binom :refer [dbinom pbinom]]
+    [alg.binom :refer [dbinom pbinom qbinom]]
     [rcljswidgets.utils :refer [fabs close? all-close?]]
     ))
 
@@ -34,3 +34,12 @@
     (is (close? (pbinom 2 10 0.3) 0.3827828))
     (is (close? (pbinom 2 10 0.3 false) 0.6172172))
     (is (all-close? (pbinom [2 5 8], 10, 0.3) [0.3827828 0.9526510 0.9998563]))))
+
+(deftest
+  check-qbinom
+  (testing "qbinom agrees with R qbinom"
+    (is (close? (qbinom 0.34 300 0.7 true) 207))
+    (is (all-close? (qbinom 0.34 300 [0.7 0.8 0.9] true) [207 237 268]))
+    (is (all-close? (qbinom 0.34 300 [0.7 0.8 0.9] false) [213 243 272]))
+    (is (all-close? (qbinom [0.2 0.34] 300 [0.7 0.8 0.9] false) [217 243 274]))
+    ))

@@ -30,14 +30,6 @@
 (defn all-close?
   "true if floating point values in s1 are close to floating point values in s2"
   [s1 s2]
-  (every? true? (map close? s1 s2)))
+  (and (= (count s1) (count s2)) (every? true? (map close? s1 s2))))
 
-(defn r-wrap
-  "x as a vector or sequence if it isn't one already"
-  [x]
-  (if (or (vector? x) (seq? x)) x [x]))
 
-(defn r-unwrap
-  "if x is a vector or sequence with 1 value, return that value, else return x unchanged"
-  [x]
-  (if (= (rest x) ()) (first x) x))

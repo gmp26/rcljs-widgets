@@ -2,7 +2,8 @@
   (:require
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
-    [rcljswidgets.utils :refer [clamp fabs epsilon close0? close? all-close? r-wrap r-unwrap]]
+    [rcljswidgets.utils :refer [clamp fabs epsilon close0? close? all-close?]]
+    [rcljswidgets.r-call :refer [r-wrap r-unwrap]]
     ))
 
 (deftest
@@ -28,7 +29,8 @@
     (is (not (close0? epsilon)))
     (is (close0? (* epsilon -0.9999)))
     (is (close? 3.14159 (.-PI js/Math)))
-    (is (all-close? [1 2 3 (/ 1 2)] [1 2 3 0.5]))))
+    (is (all-close? [1 2 3 (/ 1 2)] [1 2 3 0.5]))
+    (is (not (all-close? [1 2 3] [1 2])))))
 
 (deftest
   R-vector-value
@@ -49,27 +51,3 @@
     (is (= 2 (r-unwrap [2])))
     (is (= 2 (r-unwrap '(2))))
     (is (= [1 2] (r-unwrap [1 2])))))
-
-
-(comment
-  (defn close0? [a]
-    "true if |a| < epsilon"
-    (< (fabs (- a 0)) epsilon))
-
-  (defn close? [a b]
-    "true if |a - b| < epsilon"
-    (if (close0? b)
-      (close0? a)
-      (close0? (fabs (dec (/ a b))))))
-
-  (defn all-close? [s1 s2]
-    "true if floating point values in s1 are close to floating point values in s2"
-    (every? true? (map close? s1 s2)))
-
-  (defn r-wrap [x]
-    "x as a vector or sequence if it isn't one already"
-    (if (or (vector? x) (seq? x)) x [x]))
-
-  (defn r-unwrap [x]
-    "if x is a vector or sequence with 1 value, return that value, else return x unchanged"
-    (if (= (rest x) ()) (first x) x)))

@@ -1,6 +1,6 @@
 (ns alg.binom
   (:require [rcljswidgets.utils :refer [fabs]]
-            [rcljswidgets.utils :refer [r-wrap r-unwrap]]))
+            [rcljswidgets.r-call :refer [r-wrap r-unwrap cycled-apply]]))
 
 
 
@@ -80,12 +80,14 @@
 ;;;
 ;; Evaluate dbinom on 1 or more quantiles.
 ;;
-;; Note that dbinom, pbinom, and qbinom take scalar parameters unless vectors are explicitly allowed.
-;;
-;; This is not (yet) exactly as the R equivalent function works
+;; Note that R's dbinom, pbinom, and qbinom take vector parameters which are recycled up to the length
+;; of the longest vector, so we need cycled-apply.
 ;;
 ;;;
 (defn dbinom [x n p]
+  (cycled-apply dbinom1 x n p))
+
+#_(defn dbinom [x n p]
   "x is a vector of n-quantile indexes
   Return their densities"
   (let [x (r-wrap x)
@@ -96,29 +98,40 @@
 ;;;
 ;; Evaluate distribution function
 ;;;
-(defn pbinom [x n p & [tails]]
-  "x is a vector of n-quantile indexes or a single quantile index.
+(defn quantiles
+  "probably better to call a memoized version of this function where possible"
+  [n p]
+  (into [] (reductions + (map #(dbinom % n p) (range (inc n))))))
+
+(def m-quantiles (memoize quantiles))
+
+(defn pbinom1 [x n p tails]
+  "x is a single quantile index.
   We first calculate all quantiles up to (max x), and return only
   those indicated by x"
-  (let [tails (if (nil? tails) true tails)
-        x (r-wrap x)
-        all-q (into [] (take (inc (apply max x)) (reductions + (map #(dbinom % n p) (range (inc n))))))]
-    ;(prn tails)
-    ;(r-unwrap (map #(all-q %) x))
-    (r-unwrap (map (comp (if tails identity #(- 1 %)) all-q) x))))
+  ((if tails identity #(- 1 %)) ((m-quantiles n p) x)))
 
+(defn pbinom
+  "vectorised version of pbinom1 - allowing R-style vector parameters"
+  [x n p & [tails]]
+  (let [tails (if (nil? tails) true tails)]
+    (cycled-apply pbinom1 x n p tails)))
 
 ;;;
 ;; Evaluate qbinom.
 ;;;
-(defn qbinom [p size prob & [tails]]
+(defn qbinom1 [p size prob tails]
   "The quantile is defined as the smallest value x such that F(x) ≥ p,
-  where F is the distribution function.
-  In this case we allow prob to be a vector"
-  (let [prob (r-wrap prob)]
+  where F is the distribution function."
+  (if tails
+    (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range (inc size)))))
+    (- size (dec (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range size -1 -1))))))))
 
-    ))
-
+(defn qbinom
+  "vectorised version of qbinom1 - allowing R-style vector parameters"
+  [p size prob & [tails]]
+  (let [tails (if (nil? tails) true tails)]
+    (cycled-apply qbinom1 p size prob tails)))
 
 ;;;
 ;; Evaluate dpois
