@@ -4,12 +4,14 @@
 
 (defstyle styles
           [[".open" {:fill         "none"
-                     :stroke       "#000"
-                     :stroke-width 1}]
+                     :stroke       "#fff"
+                     :stroke-width 2
+                     :opacity      0.5}]
            [".filled" {:fill         "#000"
-                       :r            3
-                       :stroke       "rgba(0,128,128,0.2)"
-                       :stroke-width 5}]
+                       :r            4
+                       :stroke       "#fff"
+                       :stroke-width 2
+                       :opacity      0.5}]
            [".hovered" {:fill         "#000"
                         :stroke       "rgba(0,128,128,0.3)"
                         ;:r 10

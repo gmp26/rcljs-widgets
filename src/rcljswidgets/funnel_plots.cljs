@@ -5,6 +5,8 @@
             [svg.axis :refer [axisBottom axisTop axisLeft axisRight]]
             [svg.scales :refer [->Identity nice-linear i->o o->i in out ticks]]
             [svg.markers :refer [dot odot square osquare diamond odiamond cross plus]]
+            [rcljswidgets.utils :refer [clamp]]
+            [alg.binom-limits :refer [qbinom-interp1]]
             [tests.funnel-data :refer [CABG]]
             ))
 
@@ -17,7 +19,11 @@
                       :stroke "none"}]
            [".annotation" {:font-size "10pt"}]
            [".arrow" {:stroke       "#000"
-                      :stroke-width "1.5px"}]])
+                      :stroke-width "1.5px"}]
+           [".inner-prediction" {:stroke       "none"
+                                 :stroke-width 0
+                                 :fill         "#08f"
+                                 :opacity      0.3}]])
 
 
 
@@ -81,6 +87,12 @@
              {:obs-prop  (/ Survivors Cases)
               :pred-prop (- 1 (/ EMR 100))}))))
 
+(defn mean-target
+  "Calculate a target from the mean obs-prop"
+  [data]
+  (/ (reduce + (map * (map :obs-prop data) (map :Cases data)))
+     (reduce + (map :Cases data)))
+  )
 
 ;; In the original R we have:
 ;;
@@ -115,7 +127,7 @@
 (defn data-space
   "Calculate inner plot space and appropriate scales from the outer plot dimensions,
   margins, padding, and data extent."
-  [outer margin padding data]
+  [outer margin padding data tails]
   (let [inner {:width  (- (:width outer) (:left margin) (:right margin))
                :height (- (:height outer) (:top margin) (:bottom margin))}
         width (- (:width inner) (:left padding) (:right padding))
@@ -130,10 +142,54 @@
      :x       (nice-linear x-range [0 width] 5)
      :y       (nice-linear y-range [height 0] 5)
      :data    data
+     :tails   (if tails tails [0.001 0.025])
      }))
 
 
-(rum/defc funnel [{:keys [outer margin inner padding width height x y data]}]
+(defn predicted-region-path
+  [x y width height target tail tails]
+
+  (let [[x0 x1] (in x)
+        [y0 y1] (in y)
+        step (int (/ (- x1 x0) 100))]
+
+    ;[p denom target tail]
+    ;(prn "y0 y1" [y0 y1])
+    (str "M "
+         (s/join
+           " "
+           (rest
+             (flatten
+               [(map (fn [precision]
+
+                       ["L"
+                        ((i->o x) precision)
+                        ((i->o y) (clamp
+                                    y0
+                                    (qbinom-interp1 (- 1 (/ tail 2))
+                                                    precision
+                                                    target
+                                                    tails)
+                                    y1))])
+                     (range (inc x0) (+ x1 step) step))
+
+                (map (fn [precision]
+
+                       ["L"
+                        ((i->o x) precision)
+                        ((i->o y) (clamp
+                                    y0
+                                    (qbinom-interp1 (/ tail 2)
+                                                    precision
+                                                    target
+                                                    tails)
+                                    y1))])
+                     (range (inc x1) x0 (- step)))
+                " Z"]))
+           ))
+    ))
+
+(rum/defc funnel [{:keys [outer margin inner padding width height x y data tails]}]
   (let [inner (if (nil? inner) {:width  (- (:width outer) (:left margin) (:right margin))
                                 :height (- (:height outer) (:top margin) (:bottom margin))}
                                inner)
@@ -142,7 +198,8 @@
         ]
 
     (let [x-ticks (ticks x)
-          y-ticks (ticks y)]
+          y-ticks (ticks y)
+          target (mean-target data)]
       [:svg {:width  (:width outer)
              :height (:height outer)}
 
@@ -166,20 +223,24 @@
 
          ;; add axes and offset them from plot-are edges
          [:g {:key       "bottom"
-              :transform (str "translate(0," (+ (first (out y)) 10) ")")}
+              :transform (str "translate(0," (+ (first (out y)) 0) ")")}
           (axisBottom {:scale x :ticks x-ticks})]
          [:g {:key       "left"
-              :transform (str "translate(" (- (first (out x)) 10) ",0)")}
+              :transform (str "translate(" (- (first (out x)) 0) ",0)")}
           (axisLeft {:scale y :ticks y-ticks})]
 
-         ;; add plotted data
-         #_[:g {:key "data"}
-            (for [i (range (count data))
-                  :let [hospital (nth data i)
-                        op (:obs-prop hospital)
-                        cases (:Cases hospital)]]
-              (rum/with-key (dot 2.5 ((i->o x) cases) ((i->o y) op)) (str "dot" i)))]
+         ;; plot region bounded by outer upper and outer lower limits
+         [:g {:key "inner"}
+          [:path {:class-name (:inner-prediction styles)
+                  :d          (predicted-region-path x y (:width inner) (:height inner) target (tails 1) "upper")}]
+          ]
 
+         [:g {:key "outer"}
+          [:path {:class-name (:inner-prediction styles)
+                  :d          (predicted-region-path x y (:width inner) (:height inner) target (tails 0) "lower")}]
+          ]
+
+         ;; plot observed properties
          [:g {:key "data"}
           (map
             #(rum/with-key (apply (partial dot 2.5) %) (gensym "dot"))
@@ -189,14 +250,6 @@
                  data))
           ]
 
-         #_[:g {:key "data"}
-            (map-indexed
-              #(rum/with-key (apply (partial dot 2.5) %2) (str "dot" %1))
-
-              (map (fn [hospital]
-                     [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])
-                   data))
-          ]
 
          ]
         ]])))

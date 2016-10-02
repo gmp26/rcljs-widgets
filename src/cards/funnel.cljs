@@ -18,7 +18,8 @@
 (defcard
   "a funnel"
   (funnel (data-space outer margin padding
-                      (derived-data CABG))))
+                      (derived-data CABG)
+                      [0.001 0.025])))
 
 (deftest
   non-negative
@@ -49,4 +50,5 @@
 (defcard
   "zero Cases count and nil Survival count"
   (funnel (data-space outer margin padding
-                      (derived-data (assoc-in CABG [0 :Cases] 0)))))
+                      (derived-data (assoc-in CABG [0 :Cases] 0))
+                      [0.001 0.025])))

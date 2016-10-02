@@ -15,6 +15,7 @@
     [tests.scales]
     [tests.dbinom]
     [tests.r-calls]
+    [tests.binom-limits]
     ))
 
 (defn ^:export main []
