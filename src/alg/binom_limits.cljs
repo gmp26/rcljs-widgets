@@ -1,5 +1,5 @@
 (ns alg.binom-limits
-  (:require [alg.binom :refer [dbinom pbinom qbinom]]
+  (:require [alg.binom :refer [dbinom1 pbinom1 qbinom1]]
             [rcljswidgets.utils :refer [epsilon]]
             [rcljswidgets.r-call :refer [cycled-apply]]))
 
@@ -34,13 +34,15 @@
 
   [p denom target tail]
   (if (= tail :lower)
-    (let [rp (qbinom p denom target)                        ; lowest R such that df > p
-          alpha (/ (- (pbinom rp denom target) p) (dbinom rp denom target))]
-      (max (/ (- rp alpha) denom) epsilon))           ; why not zero?
+    (let [rp (qbinom1 p denom target)                       ; lowest R such that df > p
+          alpha (/ (- (pbinom1 rp denom target) p) (dbinom1 rp denom target))]
+      (max (/ (- rp alpha) denom) epsilon))                 ; why not zero?
     ;; else (= tail :upper)
-    (let [rp (qbinom (- 1 p) denom target)                  ; highest such that P(>= x) > p
-          alpha (/ (+ (pbinom rp denom target) -1 p) (dbinom rp denom target))]
+    (let [rp (qbinom1 (- 1 p) denom target)                 ; highest such that P(>= x) > p
+          alpha (/ (+ (pbinom1 rp denom target) -1 p) (dbinom1 rp denom target))]
       (min (/ (- rp -1 alpha) denom) (- 1 epsilon)))))
+
+(def m-qbinom-interp (memoize qbinom-interp1))
 
 (defn qbinom-interp
   "with R vector parameters"

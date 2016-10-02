@@ -6,7 +6,7 @@
             [svg.scales :refer [->Identity nice-linear i->o o->i in out ticks]]
             [svg.markers :refer [dot odot square osquare diamond odiamond cross plus]]
             [rcljswidgets.utils :refer [clamp]]
-            [alg.binom-limits :refer [qbinom-interp1]]
+            [alg.binom-limits :refer [qbinom-interp1 m-qbinom-interp]]
             [tests.funnel-data :refer [CABG]]
             ))
 
@@ -14,18 +14,24 @@
 
 (defstyle styles
           [[".outer" {:fill   "none"
-                      :stroke "#000"}]
-           [".inner" {:fill   "#fff"
+                      :stroke "none"}]
+           [".inner" {:fill   "none"
                       :stroke "none"}]
            [".annotation" {:font-size "10pt"}]
+           [".titles" {:fill "#000"
+                       :opacity 0.5}]
            [".arrow" {:stroke       "#000"
                       :stroke-width "1.5px"}]
            [".inner-prediction" {:stroke       "none"
                                  :stroke-width 0
                                  :fill         "#08f"
-                                 :opacity      0.3}]])
-
-
+                                 :font-weight  500
+                                 :opacity      0.6}]
+           [".prediction" {:stroke       "none"
+                           :stroke-width 0
+                           :fill         "#08f"
+                           :font-weight  500
+                           :opacity      0.3}]])
 
 ;;
 ;; R-code (without error handling)
@@ -151,7 +157,7 @@
 
   (let [[x0 x1] (in x)
         [y0 y1] (in y)
-        step (int (/ (- x1 x0) 100))]
+        step (int (/ (- x1 x0) 50))]
 
     ;[p denom target tail]
     ;(prn "y0 y1" [y0 y1])
@@ -166,12 +172,13 @@
                         ((i->o x) precision)
                         ((i->o y) (clamp
                                     y0
-                                    (qbinom-interp1 (- 1 (/ tail 2))
-                                                    precision
-                                                    target
-                                                    tails)
+                                    (m-qbinom-interp (- 1 (/ tail 2))
+                                                     precision
+                                                     target
+                                                     tails)
                                     y1))])
                      (range (inc x0) (+ x1 step) step))
+
 
                 (map (fn [precision]
 
@@ -179,10 +186,10 @@
                         ((i->o x) precision)
                         ((i->o y) (clamp
                                     y0
-                                    (qbinom-interp1 (/ tail 2)
-                                                    precision
-                                                    target
-                                                    tails)
+                                    (m-qbinom-interp (/ tail 2)
+                                                     precision
+                                                     target
+                                                     tails)
                                     y1))])
                      (range (inc x1) x0 (- step)))
                 " Z"]))
@@ -203,8 +210,32 @@
       [:svg {:width  (:width outer)
              :height (:height outer)}
 
+       ;; x-axis title
+       [:text {:x         (- (/ (:width inner) 2) 70)
+               :y         (- (:height outer) 30)
+               :font-size 18
+               :class-name (:titles styles)}
+        "Number of operations per hospital"]
+
+       ;; y-axis title
+       [:text {:x         40
+               :y         (+ (/ height 2) 100)
+               :transform (str "rotate(-90 40 " (+ (/ height 2) 100) ")")
+               :font-size 18
+               :class-name (:titles styles)
+               }
+        "Survival Rate"]
+
+
        [:g {:key       0
             :transform "translate(20, 20)"}
+
+        ;; parameterise these
+        [:text {:x         (- (/ width 2) 40)
+                :y         "2.3ex"
+                :font-size 22
+                :class-name (:titles styles)}
+         "NY Cardiac Surgery"]
 
         [:rect {:key        1
                 :class-name (:outer styles)
@@ -231,12 +262,12 @@
 
          ;; plot region bounded by outer upper and outer lower limits
          [:g {:key "inner"}
-          [:path {:class-name (:inner-prediction styles)
-                  :d          (predicted-region-path x y (:width inner) (:height inner) target (tails 1) "upper")}]
+          [:path {:class-name (:prediction styles)
+                  :d          (time (predicted-region-path x y (:width inner) (:height inner) target (tails 1) "upper"))}]
           ]
 
          [:g {:key "outer"}
-          [:path {:class-name (:inner-prediction styles)
+          [:path {:class-name (:prediction styles)
                   :d          (predicted-region-path x y (:width inner) (:height inner) target (tails 0) "lower")}]
           ]
 
@@ -248,6 +279,22 @@
             (map (fn [hospital]
                    [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])
                  data))
+          ]
+
+         ;; inner legend
+         [:text {:x          (/ (:width inner) 4)
+                 :y          50
+                 :font-size  20
+                 :class-name (:inner-prediction styles)}
+          "95% predicted to be inside inner funnel"
+          ]
+
+         ;; inner legend
+         [:text {:x          (/ (:width inner) 4)
+                 :y          75
+                 :font-size  20
+                 :class-name (:prediction styles)}
+          "99.8% predicted to be inside outer funnel"
           ]
 
 

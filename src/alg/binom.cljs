@@ -88,12 +88,12 @@
   (cycled-apply dbinom1 x n p))
 
 #_(defn dbinom [x n p]
-  "x is a vector of n-quantile indexes
-  Return their densities"
-  (let [x (r-wrap x)
-        result (map (fn [q] (dbinom1 q n p)) x)]
-    (r-unwrap result)
-    ))
+    "x is a vector of n-quantile indexes
+    Return their densities"
+    (let [x (r-wrap x)
+          result (map (fn [q] (dbinom1 q n p)) x)]
+      (r-unwrap result)
+      ))
 
 ;;;
 ;; Evaluate distribution function
@@ -101,15 +101,16 @@
 (defn quantiles
   "probably better to call a memoized version of this function where possible"
   [n p]
-  (into [] (reductions + (map #(dbinom % n p) (range (inc n))))))
+  (into [] (reductions + (map #(dbinom1 % n p) (range (inc n))))))
 
 (def m-quantiles (memoize quantiles))
 
-(defn pbinom1 [x n p tails]
+(defn pbinom1 [x n p & [tails]]
   "x is a single quantile index.
   We first calculate all quantiles up to (max x), and return only
   those indicated by x"
-  ((if tails identity #(- 1 %)) ((m-quantiles n p) x)))
+  (let [tails (if (nil? tails) true tails)]
+    ((if tails identity #(- 1 %)) ((m-quantiles n p) x))))
 
 (defn pbinom
   "vectorised version of pbinom1 - allowing R-style vector parameters"
@@ -120,12 +121,13 @@
 ;;;
 ;; Evaluate qbinom.
 ;;;
-(defn qbinom1 [p size prob tails]
+(defn qbinom1 [p size prob & [tails]]
   "The quantile is defined as the smallest value x such that F(x) ≥ p,
   where F is the distribution function."
-  (if tails
-    (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range (inc size)))))
-    (- size (dec (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range size -1 -1))))))))
+  (let [tails (if (nil? tails) true tails)]
+    (if tails
+      (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range (inc size)))))
+      (- size (dec (count (take-while #(< % p) (map #(pbinom1 % size prob tails) (range size -1 -1)))))))))
 
 (defn qbinom
   "vectorised version of qbinom1 - allowing R-style vector parameters"
@@ -148,7 +150,7 @@
 ;;;
 (defn dbinom-mult [x n p]
   (if (> (* 2 x) n)
-    (dbinom-mult (- n x) (- 1 p))
+    (dbinom-mult x (- n x) (- 1 p))
     (loop [f 1 j0 0 j1 0 j2 0]
       (if (or (< j0 x) (< j1 x) (< j2 (- n x)))
         (if (and (< j0 x) (< f 1))

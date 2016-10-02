@@ -12,6 +12,7 @@
     [cards.margin-convention]
     ;[tests.check-tests]
     [tests.utils]
+    ;[tests.funnel]
     [tests.scales]
     [tests.dbinom]
     [tests.r-calls]
