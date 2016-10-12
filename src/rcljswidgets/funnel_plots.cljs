@@ -13,25 +13,36 @@
 ;(def data CABG)
 
 (defstyle styles
-          [[".outer" {:fill   "none"
-                      :stroke "none"}]
-           [".inner" {:fill   "none"
-                      :stroke "none"}]
-           [".annotation" {:font-size "10pt"}]
-           [".titles" {:fill "#000"
-                       :opacity 0.5}]
-           [".arrow" {:stroke       "#000"
-                      :stroke-width "1.5px"}]
-           [".inner-prediction" {:stroke       "none"
-                                 :stroke-width 0
-                                 :fill         "#08f"
-                                 :font-weight  500
-                                 :opacity      0.6}]
-           [".prediction" {:stroke       "none"
-                           :stroke-width 0
-                           :fill         "#08f"
-                           :font-weight  500
-                           :opacity      0.3}]])
+  [[".outer" {:fill   "none"
+              :stroke "none"}]
+   [".inner" {:fill   "none"
+              :stroke "none"}]
+   [".annotation" {:font-size "10pt"}]
+   [".titles" {:fill    "#000"
+               :opacity 0.5}]
+   [".arrow" {:stroke       "#000"
+              :stroke-width "1.5px"}]
+   [".inner-prediction" {:stroke       "none"
+                         :stroke-width 0
+                         :fill         "#08f"
+                         :font-weight  500
+                         :opacity      0.6}]
+   [".legend" {:stroke       "none"
+               :stroke-width 0
+               :fill         "#000"
+               :opacity      0.7
+               :font-weight  500
+               :font-size    "20px"
+               }
+    [".darker" {:fill "#08f" :opacity 1}]
+    [".lighter" {:fill "#08f" :opacity 0.6}]
+    [:text {:fill "#fff" :opacity 1}]]
+
+   [".prediction" {:stroke       "none"
+                   :stroke-width 0
+                   :fill         "#08f"
+                   :font-weight  500
+                   :opacity      0.3}]])
 
 ;;
 ;; R-code (without error handling)
@@ -211,17 +222,17 @@
              :height (:height outer)}
 
        ;; x-axis title
-       [:text {:x         (- (/ (:width inner) 2) 70)
-               :y         (- (:height outer) 30)
-               :font-size 18
+       [:text {:x          (- (/ (:width inner) 2) 70)
+               :y          (- (:height outer) 30)
+               :font-size  18
                :class-name (:titles styles)}
         "Number of operations per hospital"]
 
        ;; y-axis title
-       [:text {:x         40
-               :y         (+ (/ height 2) 100)
-               :transform (str "rotate(-90 40 " (+ (/ height 2) 100) ")")
-               :font-size 18
+       [:text {:x          40
+               :y          (+ (/ height 2) 100)
+               :transform  (str "rotate(-90 40 " (+ (/ height 2) 100) ")")
+               :font-size  18
                :class-name (:titles styles)
                }
         "Survival Rate"]
@@ -231,9 +242,9 @@
             :transform "translate(20, 20)"}
 
         ;; parameterise these
-        [:text {:x         (- (/ width 2) 40)
-                :y         "2.3ex"
-                :font-size 22
+        [:text {:x          (- (/ width 2) 40)
+                :y          "2.3ex"
+                :font-size  22
                 :class-name (:titles styles)}
          "NY Cardiac Surgery"]
 
@@ -282,21 +293,42 @@
           ]
 
          ;; inner legend
-         [:text {:x          (/ (:width inner) 4)
-                 :y          50
-                 :font-size  20
-                 :class-name (:inner-prediction styles)}
-          "95% predicted to be inside inner funnel"
-          ]
+         [:g {:transform (str "translate(" (/ (:width inner) 4) ", 0)")}
+          [:text {:x          0
+                  :y          50
+                  :font-size  20
+                  :class-name (:legend styles)}
+           "95%"]
+          [:text {:x          0
+                  :y          75
+                  :class-name (:legend styles)}
+           "99.8%"]
+          [:g {:transform "translate(63,0)"}
+           [:text {:x          0
+                   :y          50
+                   :class-name (:legend styles)}
+            "predicted to be within"]
+           [:g {:transform  "translate(205,50)"
+                :class-name (:legend styles)}
+            [:rect {:x 0 :y -17 :width 127 :height 20 :class "darker"}]
+            [:text {:x 2
+                    :y 0
+                    }
+             "darker funnel"]]
 
-         ;; inner legend
-         [:text {:x          (/ (:width inner) 4)
-                 :y          75
-                 :font-size  20
-                 :class-name (:prediction styles)}
-          "99.8% predicted to be inside outer funnel"
-          ]
+           ;; inner legend
 
+           [:text {:x          0
+                   :y          75
+                   :class-name (:legend styles)}
+            "predicted to be within"]
+           [:g {:transform  "translate(205,75)"
+                :class-name (:legend styles)}
+            [:rect {:x 0 :y -17 :width 127 :height 20 :class "lighter"}]
+            [:text {:x 2
+                    :y 0
+                    }
+             "lighter funnel"]]]]
 
          ]
         ]])))
