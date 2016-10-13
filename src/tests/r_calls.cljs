@@ -2,7 +2,7 @@
   (:require
     [cljs.test :refer-macros [is testing]]
     [devcards.core :refer-macros [deftest]]
-    [alg.binom :refer [dbinom1]]
+    [alg.binom :refer [dbinom1 dbinom]]
     [rcljswidgets.r-call :refer [n-cycle cycled-parameters cycled-apply]]))
 
 (deftest
@@ -22,7 +22,6 @@
       (is (= (cycled-parameters [1] [2] [3]) '([1] [2] [3])))
       (is (= (cycled-parameters [1 2 3] [2] [3]) '([1 2 3] [2 2 2] [3 3 3]))))
     (testing "apply"
-      (is (= (cycled-apply #(reduce + [%]) 3 2 1) 4))
       (is (= (cycled-apply dbinom1 1 1 1) 1))
-      (is (= (cycled-apply dbinom1 [1 2] 1 1) 1))
+      (is (= (cycled-apply dbinom1 [1 2] 1 1) [1 0]))
       )))

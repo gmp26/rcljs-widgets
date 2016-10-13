@@ -8,7 +8,7 @@
 (defn r-unwrap
   "if x is a vector or sequence with 1 value, return that value, else return x unchanged"
   [x]
-  (if (= (rest x) ()) (first x) x))
+  (if (empty? (rest x)) (first x) x))
 
 (defn n-cycle
   "lazily cycle values in v until up to length n"
