@@ -5,7 +5,7 @@
     [rWrappers.tangleRectangle :refer [adjuster]]))
 
 (defcard width-adjuster
-  (adjuster :width 100))
+  (adjuster :width 150))
 
 (defcard height-adjuster
-  (adjuster :height 200))
+  (adjuster :height 250))

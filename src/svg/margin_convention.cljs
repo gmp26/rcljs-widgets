@@ -23,8 +23,6 @@
                       :stroke-width "1.5px"
                       }]])
 
-
-
 (def patch-marker {:did-mount (patch-svg-attrs {"refX" 10
                                                 "refY" 5
                                                 "markerWidth" 6

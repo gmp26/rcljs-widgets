@@ -60,7 +60,7 @@
   (and (integer? n) (or (pos? n) (zero? n))))
 
 (defn valid-record
-  "Take a hospital record and checks that :Deaths, :Survivors and :Cases are consistent,
+  "Take a hospital record and check that :Deaths, :Survivors and :Cases are consistent,
    returning the record with those 3 fields all filled in.
    If there is insufficient or inconsistent data, return nil"
   [hospital]
@@ -74,6 +74,7 @@
 
                     (not (non-negative-int? Survivors))
                     (if (< Deaths Cases) (assoc hospital :Survivors (- Cases Deaths)) nil)
+
                     :else (assoc hospital :Cases (+ Deaths Survivors)))
       :else nil)
     ))
@@ -285,7 +286,7 @@
          ;; plot observed properties
          [:g {:key "data"}
           (map
-            #(rum/with-key (apply (partial dot 2.5) %) (gensym "dot"))
+            #(rum/with-key (apply (partial dot 4) %) (gensym "dot"))
 
             (map (fn [hospital]
                    [((comp (i->o x) :Cases) hospital) ((comp (i->o y) :obs-prop) hospital)])

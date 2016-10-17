@@ -1,3 +1,5 @@
+
+
 (ns svg.mixins
   (:require [rum.core :as rum]))
 
@@ -8,3 +10,4 @@
     (doseq [[attr value] m]
       (.setAttribute (rum/dom-node state) attr value))
     state))
+

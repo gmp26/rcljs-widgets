@@ -35,20 +35,15 @@
 
      (for [tick ticks]
        [:g {:key   (gensym "K")
-            :class "tick"
-            }
+            :class "tick"}
         [:line {:key 1
-                :x1  (x tick)
-                :y1  0
-                :x2  (x tick)
-                :y2  "0.5ex"
-                }]
+                :x1  (x tick) :y1  0
+                :x2  (x tick) :y2  "0.5ex"}]
         [:text {:key         2
                 :x           (x tick)
                 :dx          0
                 :dy          "2.2ex"
-                :text-anchor "middle"
-                } (cl-format nil specifier tick)]])]))
+                :text-anchor "middle"} (cl-format nil specifier tick)]])]))
 
 (rum/defc axisTop [{:keys [scale ticks format-specifier styles]
                        :or   {scale  (->Identity [0 1] 10)
@@ -68,8 +63,7 @@
 
      (for [tick ticks]
        [:g {:key   (gensym "K")
-            :class "tick"
-            }
+            :class "tick"}
         [:line {:key 1
                 :x1  (x tick)
                 :y1  0
@@ -80,8 +74,7 @@
                 :x           (x tick)
                 :dx          0
                 :dy          "-1ex"
-                :text-anchor "middle"
-                } (cl-format nil specifier tick)]])]))
+                :text-anchor "middle"} (cl-format nil specifier tick)]])]))
 
 (rum/defc axisLeft [{:keys [scale ticks format-specifier styles]
                      :or   {scale  (->Identity [0 1] 10)
@@ -96,8 +89,7 @@
              :x1  0
              :y1  (y y1)
              :x2  0
-             :y2  (y y2)
-             }]
+             :y2  (y y2)}]
 
      (for [tick ticks]
        [:g {:key   (gensym "K")
@@ -113,9 +105,7 @@
                 :x1  0
                 :y1  (y tick)
                 :x2  "-0.5ex"
-                :y2  (y tick)
-                }]
-        ])]))
+                :y2  (y tick)}]])]))
 
 (rum/defc axisRight [{:keys [scale ticks format-specifier styles]
                       :or   {scale  (->Identity [0 1] 10)
@@ -130,8 +120,7 @@
              :x1  0
              :y1  (y y1)
              :x2  0
-             :y2  (y y2)
-             }]
+             :y2  (y y2)}]
 
      (for [tick ticks]
        [:g {:key   (gensym "K")
@@ -141,12 +130,9 @@
                 :y           (y tick)
                 :dx          "0.7ex"
                 :dy          "0.5ex"
-                :text-anchor "start"
-                } (cl-format nil specifier tick)]
+                :text-anchor "start"} (cl-format nil specifier tick)]
         [:line {:key 1
                 :x1  0
                 :y1  (y tick)
                 :x2  "0.5ex"
-                :y2  (y tick)
-                }]
-        ])]))
+                :y2  (y tick)}]])]))

@@ -37,6 +37,16 @@
                                        :source-map-timestamp true
                                        :optimizations        :none
                                        }}
+                       {:id           "hostedcards"
+                        :source-paths ["src"]
+                        :compiler     {:main                 "example.start-ui" ;; <- and this!
+                                       :devcards             true
+                                       :asset-path           "js/compiled/hosted"
+                                       :output-to            "resources/public/js/compiled/hostedcards.js"
+                                       :output-dir           "resources/public/js/compiled/hosted"
+                                       :source-map-timestamp true
+                                       :optimizations        :none
+                                       }}
                        {:id           "rlib"
                         :source-paths ["rlib" "src"]
                         :compiler     {:main                 "rWrappers.tangleRectangle"
@@ -71,4 +81,5 @@
                                        :externs       ["externs/exported.js"]
                                        :optimizations :whitespace}}]}
 
-  :figwheel {:css-dirs ["resources/public/css"]})
+  :figwheel {:css-dirs ["resources/public/css"]
+             :server-port 3454})
